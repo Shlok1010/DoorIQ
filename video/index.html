@@ -43,18 +43,13 @@ video{width:100%;height:100%;display:block;background:#000}
 .btn.primary:hover{background:#8f6a22}
 .btn.ghost{background:transparent;color:var(--chrome-tx);border-color:#4F5A3E}
 .btn.ghost:hover{border-color:var(--chrome-mu)}
-.voice{margin-left:auto;display:flex;border:1px solid #4F5A3E;border-radius:6px;overflow:hidden}
-.voice button{background:none;border:0;color:var(--chrome-mu);font:500 13px var(--f);padding:9px 12px;cursor:pointer}
-.voice button[aria-pressed=true]{background:#3B4530;color:#fff}
-.btn:focus-visible,.voice button:focus-visible{outline:2px solid var(--brass2);outline-offset:2px}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:#4F5A3E;border:1px solid #4F5A3E;border-radius:8px;overflow:hidden}
+.btn:focus-visible,.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:#4F5A3E;border:1px solid #4F5A3E;border-radius:8px;overflow:hidden}
 .facts div{background:var(--chrome);padding:16px 18px;display:grid;gap:4px}
 .facts b{color:#fff;font-weight:600;font-size:15px}
 .facts span{color:var(--chrome-mu);font-size:14px;line-height:1.5}
 footer{max-width:1180px;margin:0 auto;padding:18px 20px 34px;border-top:1px solid #4F5A3E;color:var(--chrome-mu);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
 footer a{color:var(--brass2);font-family:var(--m);text-decoration:none}
-@media (max-width:620px){.voice{margin-left:0}}
-</style>
+@media (max-width:620px){</style>
 </head>
 <body>
 <header class="top">
@@ -66,14 +61,10 @@ footer a{color:var(--brass2);font-family:var(--m);text-decoration:none}
     <h1>Quote a custom security door in under a minute</h1>
     <p class="sub">Field measurements in. Shop drawing, bill of materials, cut list, routing and a customer-ready quote out, with your pricing and engineering rules checked on every click.</p>
   </div>
-  <div class="player"><video id="vid" controls playsinline preload="metadata" poster="../media/poster.jpg"><source id="src" src="../media/dooriq-ad.mp4" type="video/mp4">Your browser can't play this video. <a href="../media/dooriq-ad.mp4">Download it here</a>.</video></div>
+  <div class="player"><video controls playsinline preload="metadata" poster="../media/poster.jpg"><source src="../media/dooriq-ad.mp4" type="video/mp4">Your browser can't play this video. <a href="../media/dooriq-ad.mp4">Download it here</a>.</video></div>
   <div class="bar">
     <a class="btn primary" href="../">Try the live demo</a>
     <a class="btn ghost" href="https://analyticswithshlok.com" target="_blank" rel="noopener">Book a walkthrough</a>
-    <div class="voice" role="group" aria-label="Narration">
-      <button type="button" id="vF" aria-pressed="true">Upbeat narration</button>
-      <button type="button" id="vM" aria-pressed="false">Calm narration</button>
-    </div>
   </div>
   <section class="facts" aria-label="What DoorIQ does">
     <div><b>Shop drawing on every quote</b><span>Dimensioned elevation with callouts, built from the field measurements.</span></div>
@@ -83,11 +74,5 @@ footer a{color:var(--brass2);font-family:var(--m);text-decoration:none}
   </section>
 </main>
 <footer><span>Saguaro Iron Works is a sample company. Parts and prices are fictional.</span><a href="https://analyticswithshlok.com" target="_blank" rel="noopener">analyticswithshlok.com</a></footer>
-<script>
-const v=document.getElementById('vid'),s=document.getElementById('src'),F=document.getElementById('vF'),M=document.getElementById('vM');
-function pick(file,on,off){const t=v.currentTime,playing=!v.paused;s.src=file;v.load();v.addEventListener('loadedmetadata',()=>{v.currentTime=t;if(playing)v.play()},{once:true});on.setAttribute('aria-pressed','true');off.setAttribute('aria-pressed','false')}
-F.addEventListener('click',()=>pick('../media/dooriq-ad.mp4',F,M));
-M.addEventListener('click',()=>pick('../media/dooriq-ad-narrated.mp4',M,F));
-</script>
 </body>
 </html>
