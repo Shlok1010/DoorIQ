@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DoorIQ — Watch the demo</title>
+<meta name="description" content="See DoorIQ quote a custom security door in under a minute: shop drawing, BOM, cut list, rules and quote. Built by Analytics with Shlok.">
+<meta property="og:type" content="video.other">
+<meta property="og:title" content="DoorIQ — Quote a custom security door in under a minute">
+<meta property="og:description" content="Configure, price and build in one screen. Shop drawing, bill of materials, cut list, rules engine and ERP-ready quote.">
+<meta property="og:image" content="/media/poster.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--chrome:#2E3622;--chrome-tx:#E7EADC;--chrome-mu:#AEB39C;--canvas:#F4F2EA;--surface:#fff;--line:#DAD5C5;--ink:#1E211A;--muted:#6A6C5E;--olive:#4E5B31;--brass:#A57C2C;--brass2:#C9A35A;
+ --f:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--m:"IBM Plex Mono",ui-monospace,Menlo,monospace;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--chrome);color:var(--chrome-tx);font-family:var(--f);-webkit-font-smoothing:antialiased}
+.top{display:flex;align-items:center;gap:10px;padding:14px 20px;max-width:1180px;margin:0 auto}
+.mark{width:26px;height:26px;border-radius:5px;background:var(--brass);display:grid;place-items:center;flex:none}
+.top b{font-size:16px;font-weight:600;color:#fff}
+.top span{color:var(--chrome-mu);font-size:13px;margin-left:auto}
+main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:18px 48px;display:grid;gap:22px}
+h1{margin:0;font-size:clamp(26px,4vw,40px);font-weight:600;letter-spacing:-.015em;color:#fff;text-wrap:balance;max-width:24ch}
+.sub{margin:0;color:var(--chrome-mu);font-size:16px;max-width:62ch;line-height:1.55}
+.player{background:#000;border-radius:10px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);aspect-ratio:16/9;max-width:100%}
+video{width:100%;height:100%;display:block;background:#000}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;border-radius:6px;font:600 14px var(--f);text-decoration:none;border:1px solid transparent;cursor:pointer}
+.btn.primary{background:var(--brass);color:#fff}
+.btn.primary:hover{background:#8f6a22}
+.btn.ghost{background:transparent;color:var(--chrome-tx);border-color:#4F5A3E}
+.btn.ghost:hover{border-color:var(--chrome-mu)}
+.voice{margin-left:auto;display:flex;border:1px solid #4F5A3E;border-radius:6px;overflow:hidden}
+.voice button{background:none;border:0;color:var(--chrome-mu);font:500 13px var(--f);padding:9px 12px;cursor:pointer}
+.voice button[aria-pressed=true]{background:#3B4530;color:#fff}
+.btn:focus-visible,.voice button:focus-visible{outline:2px solid var(--brass2);outline-offset:2px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:#4F5A3E;border:1px solid #4F5A3E;border-radius:8px;overflow:hidden}
+.facts div{background:var(--chrome);padding:16px 18px;display:grid;gap:4px}
+.facts b{color:#fff;font-weight:600;font-size:15px}
+.facts span{color:var(--chrome-mu);font-size:14px;line-height:1.5}
+footer{max-width:1180px;margin:0 auto;padding:18px 20px 34px;border-top:1px solid #4F5A3E;color:var(--chrome-mu);font-size:13px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
+footer a{color:var(--brass2);font-family:var(--m);text-decoration:none}
+@media (max-width:620px){.voice{margin-left:0}}
+</style>
+</head>
+<body>
+<header class="top">
+  <span class="mark" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="5" y="3" width="14" height="18" rx=".5"/><path d="M9.5 3v18M14.5 3v18M5 12h14"/></svg></span>
+  <b>DoorIQ</b><span>by Analytics with Shlok</span>
+</header>
+<main>
+  <div style="display:grid;gap:10px">
+    <h1>Quote a custom security door in under a minute</h1>
+    <p class="sub">Field measurements in. Shop drawing, bill of materials, cut list, routing and a customer-ready quote out, with your pricing and engineering rules checked on every click.</p>
+  </div>
+  <div class="player"><video id="vid" controls playsinline preload="metadata" poster="/media/poster.jpg"><source id="src" src="/media/dooriq-ad.mp4" type="video/mp4">Your browser can't play this video. <a href="/media/dooriq-ad.mp4">Download it here</a>.</video></div>
+  <div class="bar">
+    <a class="btn primary" href="/">Try the live demo</a>
+    <a class="btn ghost" href="https://analyticswithshlok.com" target="_blank" rel="noopener">Book a walkthrough</a>
+    <div class="voice" role="group" aria-label="Narration">
+      <button type="button" id="vF" aria-pressed="true">Upbeat narration</button>
+      <button type="button" id="vM" aria-pressed="false">Calm narration</button>
+    </div>
+  </div>
+  <section class="facts" aria-label="What DoorIQ does">
+    <div><b>Shop drawing on every quote</b><span>Dimensioned elevation with callouts, built from the field measurements.</span></div>
+    <div><b>BOM, cut list and routing</b><span>Parts, cuts nested on 24-foot stock, and labor by work center.</span></div>
+    <div><b>Rules that protect margin</b><span>Out-of-square, egress and discount problems caught before the quote is sent.</span></div>
+    <div><b>Connects to your ERP</b><span>Sales order, BOM and routing pushed to SYSPRO, Epicor or your system.</span></div>
+  </section>
+</main>
+<footer><span>Saguaro Iron Works is a sample company. Parts and prices are fictional.</span><a href="https://analyticswithshlok.com" target="_blank" rel="noopener">analyticswithshlok.com</a></footer>
+<script>
+const v=document.getElementById('vid'),s=document.getElementById('src'),F=document.getElementById('vF'),M=document.getElementById('vM');
+function pick(file,on,off){const t=v.currentTime,playing=!v.paused;s.src=file;v.load();v.addEventListener('loadedmetadata',()=>{v.currentTime=t;if(playing)v.play()},{once:true});on.setAttribute('aria-pressed','true');off.setAttribute('aria-pressed','false')}
+F.addEventListener('click',()=>pick('/media/dooriq-ad.mp4',F,M));
+M.addEventListener('click',()=>pick('/media/dooriq-ad-narrated.mp4',M,F));
+</script>
+</body>
+</html>
