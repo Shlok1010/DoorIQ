@@ -5,274 +5,287 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="DoorIQ: configure, price and build custom security doors in one screen. Demo by Analytics with Shlok.">
 <meta property="og:title" content="DoorIQ — Saguaro Iron Works">
-<meta property="og:description" content="Configure-price-quote demo for security door manufacturers: live drawing, BOM, cut list, routing, rules engine and quote.">
+<meta property="og:description" content="Configure-price-quote demo for security door manufacturers: shop drawing, BOM, cut list, routing, rules engine, approvals and quote.">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>DoorIQ — Saguaro Iron Works</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: WindowIQ-style app shell — top bar, configuration sidebar, product stage, BOM / cut list / routing / rules / quote panel. Light-only by design, matching the WindowIQ suite. */
+/* Layout: enterprise record screen — olive app chrome, quote record header with approval workflow, configuration rail | shop-drawing sheet | data panel, status bar. Light-only by design (Olive & brass). */
 :root{
-  --bg:#f7f5f2; --surface:#ffffff; --preview:#f0ece6; --border:#e4e0da; --text:#1a1917; --muted:#7a7670;
-  --blue:#1a56db; --blue-soft:#eff6ff; --green:#059669; --green-soft:#ecfdf5; --green-line:#a7f3d0;
-  --amber:#d97706; --amber-soft:#fffbeb; --amber-line:#fde68a; --red:#dc2626; --red-soft:#fef2f2; --red-line:#fecaca;
-  --ink:#1f1d1a;
-  --f-ui:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --chrome:#2E3622; --chrome-2:#3B4530; --chrome-tx:#E7EADC; --chrome-mu:#AEB39C;
+  --canvas:#F4F2EA; --surface:#FFFFFF; --sunk:#F9F8F3; --line:#DAD5C5; --line-soft:#ECE8DC;
+  --ink:#1E211A; --muted:#6A6C5E; --faint:#9B9C8C;
+  --olive:#4E5B31; --olive-2:#3F4A27; --olive-soft:#EEF0E5;
+  --brass:#A57C2C; --brass-soft:#F6EFDF;
+  --ok:#2E7346; --ok-soft:#E4EFE6; --warn:#A8650F; --warn-soft:#F8EDD9; --err:#A3271F; --err-soft:#F6E1DE;
+  --f-ui:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   color-scheme:light;
 }
 html,body{height:100%}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:var(--f-ui);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit}
-.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+body{background:var(--canvas);color:var(--ink);font-family:var(--f-ui);font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+.num{font-variant-numeric:tabular-nums}
+.pn{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
 
-.shell{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr)}
-/* top bar */
-.topbar{display:flex;align-items:center;gap:16px;padding-block:10px;padding-inline:16px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:10px;min-width:0}
-.logo-mark{width:32px;height:32px;border-radius:8px;background:var(--blue);display:grid;place-items:center;flex:none}
-.logo b{font-size:17px;font-weight:700;letter-spacing:-.01em;display:block;line-height:1.1}
-.logo span{font-size:11px;color:var(--muted)}
-.pill{flex:1 1 300px;display:flex;justify-content:center;min-width:0}
-.pill span{border:1px solid var(--border);background:var(--bg);border-radius:999px;padding:6px 14px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.top-right{display:flex;align-items:center;gap:14px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
-.jobsel{display:flex;flex-direction:column;gap:2px}
-.jobsel label,.qt-l{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.jobsel select{font:inherit;font-size:12.5px;border:1px solid var(--border);border-radius:8px;padding:5px 8px;background:var(--surface);max-width:220px}
-.qt{display:flex;flex-direction:column;align-items:flex-end}
-.qt-v{font-size:20px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;line-height:1.1}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;font-size:13px;font-weight:600;padding:9px 14px;border:1px solid var(--border);background:var(--surface);cursor:pointer}
-.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
-.btn.primary:hover{background:#1648b8}
-.btn.ghost:hover{border-color:#c9c3b9}
-.btn[disabled]{background:#efece7;color:#a9a49c;border-color:var(--border);cursor:not-allowed}
-.btn svg{flex:none}
+#cam{height:100%;position:relative;transform-origin:0 0;transition:transform 1s cubic-bezier(.65,0,.35,1)}
+.app{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto}
 
-/* three panes */
-.panes{display:grid;grid-template-columns:300px minmax(0,1fr) 420px;min-height:0}
-.side{background:var(--surface);border-right:1px solid var(--border);overflow:auto;padding:14px 14px 28px}
-.stage{overflow:auto;background:var(--preview);display:flex;flex-direction:column;align-items:center;gap:16px;padding:16px 20px 28px;min-width:0}
-.right{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0;min-width:0}
-@media (max-width:1240px){
-  .shell{height:auto}
-  .panes{grid-template-columns:300px minmax(0,1fr)}
-  .right{grid-column:1 / -1;border-left:0;border-top:1px solid var(--border)}
-  .side,.stage,.right .tabbody{overflow:visible}
+/* app chrome */
+.chrome{background:var(--chrome);color:var(--chrome-tx);display:flex;align-items:center;gap:6px;padding-inline:12px;height:46px;min-width:0}
+.brand{display:flex;align-items:center;gap:9px;padding-right:14px;margin-right:4px;border-right:1px solid rgba(255,255,255,.12);height:28px;flex:none}
+.brand-mark{width:24px;height:24px;border-radius:4px;background:var(--brass);display:grid;place-items:center}
+.brand b{font-weight:600;font-size:14.5px;letter-spacing:.01em}
+.modnav{display:flex;gap:2px;overflow-x:auto;min-width:0}
+.modnav button{background:none;border:0;color:var(--chrome-mu);padding:6px 11px;border-radius:4px;cursor:pointer;white-space:nowrap;font-size:13px}
+.modnav button:hover{color:var(--chrome-tx);background:var(--chrome-2)}
+.modnav button.cur{color:#fff;background:var(--chrome-2);box-shadow:inset 0 -2px 0 var(--brass)}
+.chrome-r{margin-left:auto;display:flex;align-items:center;gap:12px;flex:none}
+.org{font-size:12px;color:var(--chrome-mu);text-align:right;line-height:1.2}
+.org b{display:block;color:var(--chrome-tx);font-weight:500;font-size:12.5px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--olive-soft);color:var(--olive-2);display:grid;place-items:center;font-weight:600;font-size:11.5px}
+@media (max-width:760px){.org{display:none}}
+
+/* record header */
+.rec{background:var(--surface);border-bottom:1px solid var(--line);padding-block:12px 0;padding-inline:20px}
+.crumbs{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.crumbs a{color:var(--olive);text-decoration:none}
+.rec-top{display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px 24px;margin-top:4px}
+.rec-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.rec-title h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.005em;text-wrap:balance}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:2px 8px;border-radius:3px;border:1px solid}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.b-ok{color:var(--ok);background:var(--ok-soft);border-color:#c3dcc9}
+.b-warn{color:var(--warn);background:var(--warn-soft);border-color:#ecd3a8}
+.b-err{color:var(--err);background:var(--err-soft);border-color:#e8bdb7}
+.b-sent{color:var(--olive);background:var(--olive-soft);border-color:#d3d8c2}
+.rec-actions{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:4px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:#bdb7a5;background:var(--sunk)}
+.btn.primary{background:var(--olive);border-color:var(--olive);color:#fff}
+.btn.primary:hover{background:var(--olive-2)}
+.btn.brass{background:var(--brass);border-color:var(--brass);color:#fff}
+.btn.brass:hover{background:#8f6a22}
+.btn[disabled]{background:#F0EEE7;color:#A8A797;border-color:var(--line);cursor:not-allowed}
+.sel{height:32px;border:1px solid var(--line);border-radius:4px;background:var(--surface);padding:0 8px;font-size:13px;max-width:260px}
+.rec-meta{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:10px;font-size:12px}
+.rec-meta div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.rec-meta span{color:var(--muted)}
+.rec-meta b{font-weight:500}
+.stepper{display:flex;margin-top:12px;overflow-x:auto}
+.step{display:flex;align-items:center;gap:8px;padding:9px 18px 9px 0;font-size:12.5px;color:var(--faint);white-space:nowrap;border-bottom:2px solid transparent;margin-right:18px}
+.step i{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:10.5px;font-weight:600}
+.step.done{color:var(--ink)} .step.done i{background:var(--olive);border-color:var(--olive);color:#fff}
+.step.cur{color:var(--ink);font-weight:500;border-bottom-color:var(--brass)} .step.cur i{border-color:var(--brass);color:var(--brass)}
+.step.cur.err{border-bottom-color:var(--err)} .step.cur.err i{border-color:var(--err);color:var(--err)}
+.step.cur.warn{border-bottom-color:var(--warn)} .step.cur.warn i{border-color:var(--warn);color:var(--warn)}
+
+/* body */
+.body{display:grid;grid-template-columns:320px minmax(0,1fr) 460px;min-height:0}
+.rail{background:var(--surface);border-right:1px solid var(--line);overflow:auto}
+.center{overflow:auto;padding:16px 20px 24px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel{background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;min-width:0}
+@media (max-width:1320px){
+  .app{height:auto} #cam{height:auto}
+  .body{grid-template-columns:320px minmax(0,1fr)}
+  .panel{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}
+  .rail,.center,.tbody{overflow:visible}
 }
-@media (max-width:760px){
-  .panes{grid-template-columns:minmax(0,1fr)}
-  .side{border-right:0;border-bottom:1px solid var(--border)}
-  .pill{order:3;flex-basis:100%}
-}
+@media (max-width:820px){.body{grid-template-columns:minmax(0,1fr)} .rail{border-right:0;border-bottom:1px solid var(--line)}}
 
-/* sidebar */
-.sec-h{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin:2px 0 10px}
-.grp{padding:12px 0 14px;border-top:1px solid var(--border);display:grid;gap:8px}
-.grp:first-of-type{border-top:0;padding-top:4px}
-.lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
-.lbl em{font-style:normal;font-weight:500;letter-spacing:0;text-transform:none;color:var(--muted)}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 4px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-size:12.5px;text-align:center;line-height:1.2;min-height:76px}
-.tile svg{color:var(--text)}
-.tile:hover,.card:hover,.sw:hover{border-color:#c9c3b9}
-.on{border:1.33px solid var(--blue)!important;background:var(--blue-soft)!important;color:var(--blue)!important;box-shadow:0 0 0 2px rgba(26,86,219,.08)}
-.on svg{color:var(--blue)}
-.cards{display:grid;gap:6px}
-.card{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:baseline;text-align:left;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer}
-.card b{font-weight:500;font-size:13.5px}
-.card span{font-size:12px;color:var(--muted)}
-.card.on span{color:#3b6fe0}
-.card .tag{grid-column:1/-1}
-.field{display:grid;gap:4px}
-.field label{font-size:11px;color:var(--muted)}
-.inp{font-family:var(--f-mono);font-size:14px;border:1px solid var(--border);border-radius:8px;padding:8px 10px;background:var(--surface);width:100%;min-width:0;color:var(--text)}
-.inp.bad{border-color:var(--red);background:var(--red-soft)}
-.r3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.r2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+/* configuration rail */
+.sec{border-bottom:1px solid var(--line-soft)}
+.sec>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary .n{font-family:var(--f-mono);font-size:11px;color:var(--faint);width:16px}
+.sec>summary .t{font-weight:600;font-size:13px}
+.sec>summary .v{margin-left:auto;color:var(--muted);font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.sec>summary::after{content:"";width:7px;height:7px;border-right:1.5px solid var(--faint);border-bottom:1.5px solid var(--faint);transform:rotate(-45deg);transition:transform .15s;flex:none;margin-left:2px}
+.sec[open]>summary::after{transform:rotate(45deg)}
+.sec>summary:hover{background:var(--sunk)}
+.sec-b{padding:2px 16px 14px 42px;display:grid;gap:8px}
+.opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.opt{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 4px 8px;border:1px solid var(--line);border-radius:4px;background:var(--surface);cursor:pointer;font-size:12px;text-align:center;line-height:1.2}
+.opt svg{color:var(--muted)}
+.opt:hover,.row-opt:hover,.sw:hover{border-color:#bdb7a5}
+.on{border-color:var(--olive)!important;background:var(--olive-soft)!important;box-shadow:inset 0 0 0 1px var(--olive)}
+.on svg{color:var(--olive)}
+.rows{display:grid;gap:5px}
+.row-opt{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:2px 9px;align-items:start;text-align:left;padding:8px 10px;border:1px solid var(--line);border-radius:4px;background:var(--surface);cursor:pointer}
+.row-opt .rd{width:14px;height:14px;border-radius:50%;border:1.5px solid #bdb7a5;margin-top:1px}
+.row-opt.on .rd{border:4px solid var(--olive)}
+.row-opt b{font-weight:500;font-size:13px}
+.row-opt span.d{grid-column:2/4;font-size:11.5px;color:var(--muted)}
+.row-opt .p{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.lbl{font-size:12px;color:var(--muted)}
+.inp{height:32px;font-family:var(--f-mono);font-size:13px;border:1px solid var(--line);border-radius:4px;padding:0 8px;background:var(--surface);width:100%;min-width:0}
+.inp.bad{border-color:var(--err);background:var(--err-soft)}
+select.inp{font-family:var(--f-ui)}
+.fld{display:grid;gap:3px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.msg{font-size:12px;padding:7px 9px;border-radius:4px;border:1px solid #c3dcc9;background:var(--ok-soft);color:var(--ok)}
+.msg.warn{border-color:#ecd3a8;background:var(--warn-soft);color:var(--warn)}
+.msg.err{border-color:#e8bdb7;background:var(--err-soft);color:var(--err)}
 .hint{font-size:11.5px;color:var(--muted)}
-.note{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;padding:8px 10px;border-radius:8px;border:1px solid var(--green-line);background:var(--green-soft);color:#047857}
-.note::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;margin-top:6px;flex:none}
-.note.warn{border-color:var(--amber-line);background:var(--amber-soft);color:#92400e}
-.note.bad{border-color:var(--red-line);background:var(--red-soft);color:#991b1b}
-.segs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface)}
-.segs button{flex:1;border:0;border-left:1px solid var(--border);background:none;padding:8px 6px;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.segs{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.segs button{flex:1;border:0;border-left:1px solid var(--line);background:var(--surface);padding:6px 6px;font-size:12.5px;cursor:pointer;white-space:nowrap}
 .segs button:first-child{border-left:0}
-.segs button.sel{background:var(--blue-soft);color:var(--blue);font-weight:600;box-shadow:inset 0 -2px 0 var(--blue)}
-.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.sw{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 2px 6px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-size:10.5px;line-height:1.15;text-align:center}
-.sw i{width:24px;height:24px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15),inset 0 -4px 6px rgba(0,0,0,.18)}
-.toggles{display:grid;gap:2px}
-.tg{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 2px;cursor:pointer;font-size:13px}
-.tg small{display:block;color:var(--muted);font-size:11.5px}
-.tg input{position:absolute;opacity:0;pointer-events:none}
-.tg .sl{width:32px;height:18px;border-radius:999px;background:#d8d3cb;position:relative;flex:none;transition:background .15s}
-.tg .sl::after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
-.tg input:checked+.sl{background:var(--blue)}
-.tg input:checked+.sl::after{transform:translateX(14px)}
-.tg input:focus-visible+.sl{outline:2px solid var(--blue);outline-offset:2px}
-select.inp{font-family:var(--f-ui);font-size:13px}
+.segs button.on{box-shadow:none;background:var(--olive)!important;color:#fff}
+.sws{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.sw{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 2px 6px;border:1px solid var(--line);border-radius:4px;background:var(--surface);cursor:pointer;font-size:10.5px;line-height:1.15;text-align:center}
+.sw i{width:22px;height:22px;border-radius:3px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.tgl{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:5px 0;cursor:pointer}
+.tgl small{display:block;color:var(--muted);font-size:11.5px}
+.tgl input{position:absolute;opacity:0;pointer-events:none}
+.tgl .k{width:30px;height:17px;border-radius:999px;background:#D3CEBF;position:relative;flex:none;transition:background .15s}
+.tgl .k::after{content:"";position:absolute;left:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.tgl input:checked+.k{background:var(--olive)} .tgl input:checked+.k::after{transform:translateX(13px)}
+.tgl input:focus-visible+.k{outline:2px solid var(--brass);outline-offset:2px}
 
-/* stage */
-.calc{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:4px 12px}
-.calc i{width:7px;height:7px;border-radius:50%;background:var(--green)}
-.calc.warn i{background:var(--amber)} .calc.bad i{background:var(--red)}
-.scene{width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:10px}
-.scene svg{width:100%;height:auto;max-height:520px;display:block}
-.dimpill{font-family:var(--f-mono);font-size:12px;color:#fff;background:#2b2926;border-radius:999px;padding:4px 12px}
-.viewbar{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.chipbtn{border:1px solid var(--border);background:var(--surface);border-radius:999px;font-size:12px;padding:4px 10px;cursor:pointer}
-.chipbtn.sel{border-color:var(--blue);color:var(--blue);background:var(--blue-soft)}
-.perf{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px 16px;display:grid;gap:12px}
-.perf-h{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.perf-h em{font-style:normal;color:var(--blue);letter-spacing:.02em}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;text-align:center}
-@media (max-width:460px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.kpi b{display:block;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
-.kpi span{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.bars{display:inline-flex;gap:3px;vertical-align:middle;margin-left:4px}
-.bars i{width:5px;height:14px;border-radius:2px;background:#e4e0da}
-.bars i.f{background:var(--green)}
-.badges{display:flex;flex-wrap:wrap;gap:6px}
-.bdg{font-size:11.5px;border-radius:999px;padding:3px 10px;border:1px solid var(--border);color:var(--muted)}
-.bdg.g{background:var(--green);color:#fff;border-color:var(--green);font-weight:600}
-.bdg.a{background:var(--amber-soft);border-color:var(--amber-line);color:#92400e}
-.perf p{margin:0;font-size:12.5px;color:var(--muted)}
-.leaflist{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
-.leaf{border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px}
-.leaf b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+/* drawing sheet */
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:4px;display:flex;flex-direction:column;min-width:0}
+.sheet-bar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+.sheet-bar h2{margin:0;font-size:13px;font-weight:600}
+.sheet-bar .r{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tog{height:26px;padding:0 9px;border:1px solid var(--line);border-radius:4px;background:var(--surface);font-size:12px;cursor:pointer}
+.tog.on{box-shadow:none}
+.draw{padding:10px 14px 0;display:flex;justify-content:center}
+.draw svg{width:100%;max-width:640px;height:auto;max-height:520px;display:block}
+.tblock{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr .8fr;border-top:1px solid var(--line);font-size:11.5px}
+.tblock div{padding:6px 10px;border-left:1px solid var(--line-soft);min-width:0}
+.tblock div:first-child{border-left:0}
+.tblock span{display:block;color:var(--muted);font-size:10.5px}
+.tblock b{font-weight:500;font-family:var(--f-mono);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+@media (max-width:620px){.tblock{grid-template-columns:1fr 1fr}.tblock div{border-top:1px solid var(--line-soft)}}
+.specs{background:var(--surface);border:1px solid var(--line);border-radius:4px}
+.specs h2{margin:0;font-size:13px;font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between}
+.specs h2 span{font-weight:400;color:var(--muted);font-size:12px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:0}
+.kv div{display:flex;justify-content:space-between;gap:12px;padding:7px 12px;border-bottom:1px solid var(--line-soft);font-size:12.5px;min-width:0}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.lvl{display:inline-flex;gap:2px;margin-left:6px;vertical-align:-1px}
+.lvl i{width:4px;height:11px;background:var(--line);border-radius:1px}
+.lvl i.f{background:var(--olive)}
 
-/* right panel */
-.tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;flex:none}
-.tab{flex:1 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:13px 12px 11px;border:0;border-bottom:2px solid transparent;background:none;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
-.tab[aria-selected=true]{color:var(--blue);border-bottom-color:var(--blue);font-weight:500}
-.status{margin:10px 12px 0;flex:none}
-.tabbody{overflow:auto;min-height:0;flex:1}
-.panel{padding:10px 0 20px}
-.meta{display:flex;justify-content:space-between;align-items:center;padding:8px 12px 10px;font-size:12px;color:var(--muted)}
-.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;border-radius:999px;padding:3px 10px;background:var(--blue-soft);color:var(--blue);font-weight:500}
-.ghdr{display:flex;justify-content:space-between;padding:7px 12px;background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.ghdr span:last-child{font-family:var(--f-mono);letter-spacing:0;font-weight:500}
-.ln{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:9px 12px;border-bottom:1px solid #efebe5}
-.ln .pn{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
-.ln .d{font-size:12.5px;grid-column:1}
-.ln .q{font-size:11px;color:var(--muted);grid-column:1;font-variant-numeric:tabular-nums}
-.ln .x{grid-column:2;grid-row:1 / span 3;align-self:center;font-weight:600;font-size:13px;font-variant-numeric:tabular-nums}
-.tot{display:flex;justify-content:space-between;padding:12px;font-weight:600;font-size:13px}
-.tot span:last-child{font-variant-numeric:tabular-nums}
-
-/* cut list */
-.mat{padding:12px;border-bottom:1px solid var(--border);display:grid;gap:8px}
-.mat-h{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;flex-wrap:wrap}
-.mat-h b{font-weight:600}
-.util{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
-.stick{display:flex;height:22px;border-radius:4px;overflow:hidden;background:repeating-linear-gradient(135deg,#ebe6de 0 4px,#f7f5f2 4px 8px);border:1px solid var(--border)}
-.cutseg{display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:10px;color:#fff;background:#3a5ba8;border-right:2px solid #fff;overflow:hidden;white-space:nowrap;min-width:0}
-.cutseg.b{background:#5677c4}
-.sticklab{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
-.ptab{width:100%;border-collapse:collapse;font-size:12px}
-.ptab td{padding:4px 0;border-bottom:1px dashed #ebe6de}
-.ptab td:nth-child(n+2){text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
-
-/* routing */
-.op{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;padding:10px 12px;border-bottom:1px solid #efebe5;align-items:center}
-.op .seq{font-family:var(--f-mono);font-size:11px;color:var(--muted);width:24px}
-.op .wc{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
-.op .nm{font-size:12.5px}
-.op .hr{font-family:var(--f-mono);font-size:12.5px;text-align:right}
-.op .bar{grid-column:2 / 4;height:4px;background:#efebe5;border-radius:2px;overflow:hidden}
-.op .bar i{display:block;height:100%;background:var(--blue)}
-
-/* rules */
-.rule{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;padding:10px 12px;border-bottom:1px solid #efebe5;align-items:start}
-.rule .rid{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:2px}
-.rule .rn{font-size:12.5px;font-weight:500}
-.rule .rd{grid-column:2 / 4;font-size:12px;color:var(--muted)}
-.res{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:4px;padding:2px 7px;white-space:nowrap}
-.res.pass{background:var(--green-soft);color:#047857}
-.res.auto{background:var(--blue-soft);color:var(--blue)}
-.res.review{background:var(--amber-soft);color:#92400e}
-.res.block{background:var(--red-soft);color:#991b1b}
-.res.info{background:var(--bg);color:var(--muted)}
-
-/* quote */
-.qcard{margin:10px 12px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.qrow{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-bottom:1px solid #efebe5;font-size:13px}
-.qrow:last-child{border-bottom:0}
-.qrow small{display:block;color:var(--muted);font-size:11.5px}
-.qrow .v{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
-.qsum .qrow{border-bottom:0;padding:6px 12px;color:#4a4742}
-.qsum .qrow .v{font-weight:500}
-.qsum .grand{padding:12px;border-top:1px solid var(--border);margin-top:6px;font-size:15px;font-weight:600;align-items:center}
-.qsum .grand .v{font-size:26px;font-weight:700;color:var(--green)}
-.internal{margin:0 12px 10px;border:1px dashed #cfc9bf;border-radius:10px;padding:10px 12px;display:grid;gap:6px;font-size:12.5px}
-.internal .h{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+/* data panel */
+.tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto;flex:none;padding:0 8px}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:11px 10px 9px;font-size:12.5px;color:var(--muted);cursor:pointer;white-space:nowrap;display:inline-flex;gap:6px;align-items:center}
+.tab[aria-selected=true]{color:var(--ink);font-weight:600;border-bottom-color:var(--brass)}
+.cnt{font-family:var(--f-mono);font-size:10.5px;background:var(--sunk);border:1px solid var(--line-soft);border-radius:3px;padding:0 4px;color:var(--muted);font-weight:400}
+.cnt.err{background:var(--err-soft);color:var(--err);border-color:#e8bdb7}.cnt.warn{background:var(--warn-soft);color:var(--warn);border-color:#ecd3a8}
+.alert{margin:10px 12px 0;flex:none}
+.tbody{overflow:auto;min-height:0;flex:1}
+.pane{padding:10px 12px 20px;display:grid;gap:12px;align-content:start}
+.ptitle{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;color:var(--muted)}
+.ptitle b{font-size:13px;color:var(--ink);font-weight:600}
+table.dt{width:100%;border-collapse:collapse;font-size:12.5px}
+.dt th{font-size:11.5px;font-weight:500;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);background:var(--sunk);white-space:nowrap;position:sticky;top:0}
+.dt td{padding:6px 8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.dt td.r,.dt th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dt tr.grp td{background:var(--canvas);font-weight:600;font-size:12px;padding:5px 8px;border-bottom:1px solid var(--line)}
+.dt tr.grp td.r{font-weight:500;color:var(--muted)}
+.dt tr.tot td{font-weight:600;border-bottom:0;border-top:1px solid var(--line)}
+.dt td .s{display:block;font-size:11.5px;color:var(--muted)}
+.dtw{border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.res{font-size:11px;font-weight:500;border-radius:3px;padding:1px 6px;white-space:nowrap;border:1px solid}
+.res.pass{color:var(--ok);background:var(--ok-soft);border-color:#c3dcc9}
+.res.auto{color:var(--olive);background:var(--olive-soft);border-color:#d3d8c2}
+.res.review{color:var(--warn);background:var(--warn-soft);border-color:#ecd3a8}
+.res.block{color:var(--err);background:var(--err-soft);border-color:#e8bdb7}
+.res.info{color:var(--muted);background:var(--sunk);border-color:var(--line)}
+.stick{display:flex;height:18px;border:1px solid var(--line);border-radius:2px;overflow:hidden;background:repeating-linear-gradient(135deg,#EFEBDF 0 4px,#fff 4px 8px)}
+.stick i{display:block;background:var(--olive);border-right:2px solid #fff;min-width:0;font-style:normal;color:#fff;font-family:var(--f-mono);font-size:10px;text-align:center;line-height:16px;overflow:hidden;white-space:nowrap}
+.stick i.b{background:#6E7A4C}
+.stk{display:grid;gap:3px}
+.stk .l{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
+.wbar{height:4px;background:var(--line-soft);border-radius:2px;margin-top:3px}
+.wbar i{display:block;height:100%;background:var(--brass);border-radius:2px}
+.sumrows{display:grid;gap:4px;font-size:12.5px;padding:4px 2px}
+.sumrows div{display:flex;justify-content:space-between}
+.sumrows .g{font-size:15px;font-weight:600;border-top:1px solid var(--line);padding-top:8px;margin-top:4px}
+.sumrows .g span:last-child{color:var(--brass);font-size:20px}
+.internal{border:1px dashed #C9C2AE;border-radius:4px;padding:10px 12px;display:grid;gap:5px;font-size:12.5px;background:var(--sunk)}
+.internal .h{font-weight:600;font-size:12px}
 .internal .r{display:flex;justify-content:space-between}
-.internal .r span:last-child{font-family:var(--f-mono)}
-.mbar{height:6px;border-radius:3px;background:#efebe5;position:relative;overflow:hidden;margin-top:2px}
-.mbar i{position:absolute;left:0;top:0;bottom:0;background:var(--green)}
-.mbar b{position:absolute;top:0;bottom:0;width:2px;background:var(--red)}
-.qactions{display:grid;gap:8px;padding:6px 12px 4px}
-.erpnote{font-size:11.5px;color:var(--muted);text-align:center;padding:0 12px}
+.mbar{height:6px;border-radius:3px;background:var(--line-soft);position:relative;overflow:hidden;margin:2px 0}
+.mbar i{position:absolute;left:0;top:0;bottom:0}
+.mbar b{position:absolute;top:0;bottom:0;width:2px;background:var(--err)}
+.erpbtn{width:100%;justify-content:center}
+.erp-note{font-size:11.5px;color:var(--muted);text-align:center}
+.log{list-style:none;margin:0;padding:0;display:grid}
+.log li{display:grid;grid-template-columns:72px 10px minmax(0,1fr);gap:10px;padding:7px 0;font-size:12.5px;position:relative}
+.log time{font-family:var(--f-mono);font-size:11px;color:var(--muted);text-align:right;padding-top:1px}
+.log .dot{width:9px;height:9px;border-radius:50%;background:var(--surface);border:2px solid var(--olive);margin-top:4px;position:relative;z-index:1}
+.log .dot.warn{border-color:var(--warn)}.log .dot.err{border-color:var(--err)}.log .dot.brass{border-color:var(--brass)}
+.log li::before{content:"";position:absolute;left:86px;top:0;bottom:0;width:1px;background:var(--line)}
+.log li:first-child::before{top:12px}.log li:last-child::before{bottom:calc(100% - 12px)}
+.log .who{color:var(--muted);font-size:11.5px}
+
+/* status bar */
+.statusbar{display:flex;gap:18px;align-items:center;padding:0 14px;height:26px;background:var(--surface);border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);overflow-x:auto;white-space:nowrap}
+.statusbar .ok{color:var(--ok)}
+.statusbar .r{margin-left:auto}
 
 /* modal */
-.modal{position:fixed;inset:0;background:rgba(26,25,23,.45);display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto;z-index:20}
-.doc{background:#fff;width:100%;max-width:760px;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
-.doc-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap}
-.doc-bar span{font-size:12px;color:var(--muted)}
-.doc-in{padding:28px 32px 32px;display:grid;gap:20px}
-@media (max-width:560px){.doc-in{padding:20px 18px}}
-.doc-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.doc-top h2{margin:0;font-size:22px;letter-spacing:-.01em}
-.doc-top .co{font-size:12px;color:var(--muted)}
-.doc-meta{display:grid;grid-template-columns:auto auto;gap:2px 14px;font-size:12px;align-self:start}
-.doc-meta span:nth-child(odd){color:var(--muted)}
-.doc-meta span:nth-child(even){font-family:var(--f-mono);text-align:right}
-.doc-two{display:grid;grid-template-columns:minmax(0,1fr) 180px;gap:20px;align-items:start}
-@media (max-width:560px){.doc-two{grid-template-columns:minmax(0,1fr)}}
-.doc-box{font-size:12.5px;display:grid;gap:3px}
-.doc-box .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-.doc-thumb{border:1px solid var(--border);border-radius:8px;background:var(--preview);padding:8px}
+.modal{position:fixed;inset:0;background:rgba(30,33,26,.5);display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto;z-index:30}
+.doc{background:#fff;width:100%;max-width:780px;border-radius:4px;box-shadow:0 24px 60px rgba(0,0,0,.28)}
+.doc-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--sunk);flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.doc-in{padding:30px 36px 34px;display:grid;gap:20px}
+@media (max-width:560px){.doc-in{padding:20px 16px}}
+.lh{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:3px solid var(--olive)}
+.lh .co{display:flex;gap:10px;align-items:center}
+.lh .co b{display:block;font-size:16px}
+.lh .co span{font-size:11.5px;color:var(--muted)}
+.lh h2{margin:0;font-size:22px;font-weight:600;text-align:right}
+.dm{display:grid;grid-template-columns:auto auto;gap:1px 14px;font-size:12px;justify-content:end}
+.dm span:nth-child(odd){color:var(--muted)}
+.dm span:nth-child(even){font-family:var(--f-mono);text-align:right}
+.d2{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:20px;align-items:start}
+@media (max-width:560px){.d2{grid-template-columns:minmax(0,1fr)}}
+.db{display:grid;gap:3px;font-size:12.5px}
+.db .k{font-size:11.5px;color:var(--muted)}
+.thumb{border:1px solid var(--line);padding:6px;border-radius:2px}
 .doc table{width:100%;border-collapse:collapse;font-size:12.5px}
-.doc th{text-align:left;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1.5px solid var(--text);padding:6px 6px}
-.doc td{padding:8px 6px;border-bottom:1px solid #efebe5;vertical-align:top}
-.doc td.n,.doc th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.doc tfoot td{border-bottom:0;padding:4px 6px}
-.doc tfoot tr.g td{font-weight:700;font-size:15px;border-top:1.5px solid var(--text);padding-top:10px}
+.doc th{text-align:left;font-size:11.5px;font-weight:500;color:var(--muted);border-bottom:1.5px solid var(--ink);padding:6px}
+.doc td{padding:8px 6px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.doc .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.doc tfoot td{border-bottom:0;padding:3px 6px}
+.doc tfoot tr.g td{font-weight:600;font-size:15px;border-top:1.5px solid var(--ink);padding-top:9px}
 .terms{font-size:11.5px;color:var(--muted);display:grid;gap:4px}
-.sign{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
-.sign div{border-top:1px solid var(--text);padding-top:4px;font-size:11px;color:var(--muted)}
-.foot{font-size:11px;color:var(--muted);text-align:center;padding:10px 16px 18px}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:10px}
+.sign div{border-top:1px solid var(--ink);padding-top:4px;font-size:11px;color:var(--muted)}
 
 /* demo mode */
-#cam{height:100%;position:relative;transform-origin:0 0;transition:transform 1s cubic-bezier(.65,0,.35,1)}
 body.demo{overflow:hidden}
 body.demo #playDemo{visibility:hidden}
-.dring{position:absolute;left:0;top:0;width:0;height:0;border:2px solid var(--blue);border-radius:12px;box-shadow:0 0 0 9999px rgba(26,25,23,.26);opacity:0;pointer-events:none;z-index:15;transition:opacity .35s,left .5s cubic-bezier(.65,0,.35,1),top .5s cubic-bezier(.65,0,.35,1),width .5s cubic-bezier(.65,0,.35,1),height .5s cubic-bezier(.65,0,.35,1)}
+.dring{position:absolute;left:0;top:0;width:0;height:0;border:2px solid var(--brass);border-radius:6px;box-shadow:0 0 0 9999px rgba(30,33,26,.26);opacity:0;pointer-events:none;z-index:15;transition:opacity .35s,left .5s cubic-bezier(.65,0,.35,1),top .5s cubic-bezier(.65,0,.35,1),width .5s cubic-bezier(.65,0,.35,1),height .5s cubic-bezier(.65,0,.35,1)}
 .dring.show{opacity:1}
 .dcur{position:fixed;left:0;top:0;z-index:60;pointer-events:none;opacity:0;transition:transform .7s cubic-bezier(.45,0,.2,1),opacity .3s;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
 .dcur.show{opacity:1}
 .dcur svg{display:block;transform:translate(-4px,-3px);transition:transform .12s}
 .dcur.press svg{transform:translate(-4px,-3px) scale(.86)}
-.dcur::after{content:"";position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;background:rgba(26,86,219,.35);transform:scale(0);opacity:0}
+.dcur::after{content:"";position:absolute;left:-14px;top:-14px;width:28px;height:28px;border-radius:50%;background:rgba(165,124,44,.4);transform:scale(0);opacity:0}
 .dcur.press::after{animation:ripple .5s ease-out}
 @keyframes ripple{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.6);opacity:0}}
-.dcap{position:fixed;left:50%;bottom:28px;z-index:55;transform:translate(-50%,14px);opacity:0;transition:opacity .45s,transform .45s cubic-bezier(.2,.8,.2,1);background:rgba(26,25,23,.93);color:#fff;border-radius:14px;padding:12px 20px 12px 14px;width:max-content;max-width:min(720px,92vw);display:flex;gap:14px;align-items:center;box-shadow:0 12px 32px rgba(0,0,0,.25);pointer-events:none}
+.dcap{position:fixed;left:50%;bottom:40px;z-index:55;transform:translate(-50%,14px);opacity:0;transition:opacity .45s,transform .45s cubic-bezier(.2,.8,.2,1);background:var(--chrome);color:#fff;border-radius:6px;padding:11px 18px 11px 12px;width:max-content;max-width:min(720px,92vw);display:flex;gap:12px;align-items:center;box-shadow:0 12px 32px rgba(0,0,0,.28);pointer-events:none;border-left:3px solid var(--brass)}
 .dcap.show{opacity:1;transform:translate(-50%,0)}
-.dcap .n{font-family:var(--f-mono);font-size:11px;background:var(--blue);border-radius:6px;padding:3px 7px;flex:none}
+.dcap .n{font-family:var(--f-mono);font-size:11px;color:var(--chrome-mu);flex:none}
 .dcap b{display:block;font-size:15px;font-weight:600}
-.dcap span.t{font-size:13px;color:#d9d5ce}
-.dcard{position:fixed;inset:0;z-index:70;background:radial-gradient(120% 90% at 50% 40%,#fff 0%,var(--bg) 60%,#ebe6de 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;opacity:0;transition:opacity .6s}
+.dcap span.t{font-size:13px;color:var(--chrome-tx)}
+.dcard{position:fixed;inset:0;z-index:70;background:var(--chrome);color:var(--chrome-tx);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;opacity:0;transition:opacity .6s}
 .dcard.show{opacity:1}
-.dcard .lm{width:64px;height:64px;border-radius:16px;background:var(--blue);display:grid;place-items:center;transform:translateY(16px) scale(.9);opacity:0;transition:all .7s cubic-bezier(.2,.8,.2,1) .1s}
-.dcard h2{margin:0;font-size:clamp(32px,5vw,56px);font-weight:700;letter-spacing:-.025em;line-height:1.05;max-width:16ch;text-wrap:balance;transform:translateY(16px);opacity:0;transition:all .7s cubic-bezier(.2,.8,.2,1) .25s}
-.dcard p{margin:0;font-size:clamp(14px,1.6vw,18px);color:var(--muted);transform:translateY(16px);opacity:0;transition:all .7s cubic-bezier(.2,.8,.2,1) .4s}
-.dcard .tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;opacity:0;transition:opacity .7s .6s}
+.dcard .lm{width:60px;height:60px;border-radius:8px;background:var(--brass);display:grid;place-items:center;transform:translateY(14px);opacity:0;transition:all .7s cubic-bezier(.2,.8,.2,1) .1s}
+.dcard h2{margin:0;font-size:clamp(30px,4.6vw,52px);font-weight:600;letter-spacing:-.02em;line-height:1.08;max-width:18ch;color:#fff;text-wrap:balance;transform:translateY(14px);opacity:0;transition:all .7s cubic-bezier(.2,.8,.2,1) .25s}
+.dcard p{margin:0;font-size:clamp(14px,1.5vw,17px);color:var(--chrome-mu);transform:translateY(14px);opacity:0;transition:all .7s cubic-bezier(.2,.8,.2,1) .4s}
 .dcard.show .lm,.dcard.show h2,.dcard.show p{transform:none;opacity:1}
-.dcard.show .tags{opacity:1}
-.toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:80;background:#1a1917;color:#fff;font-size:13px;border-radius:10px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast{position:fixed;left:50%;top:60px;transform:translateX(-50%);z-index:80;background:var(--chrome);color:#fff;font-size:12.5px;border-radius:4px;padding:9px 14px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+@media (prefers-reduced-motion:reduce){#cam,.dcur,.dring,.dcap,.dcard,.dcard *{transition:none!important}}
 </style>
 </head>
 <body>
@@ -280,182 +293,198 @@ body.demo #playDemo{visibility:hidden}
 
 <div id="cam">
 <div class="dring" id="dring" aria-hidden="true"></div>
-<div class="shell">
-  <header class="topbar">
-    <div class="logo">
-      <div class="logo-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 3v18M15 3v18M5 12h14"/></svg></div>
-      <div><b>DoorIQ</b><span>Saguaro Iron Works</span></div>
-    </div>
-    <div class="pill"><span id="summary"></span></div>
-    <div class="top-right">
-      <div class="jobsel"><label for="job">Sample job</label>
-        <select id="job">
-          <option value="0">Q-26-2417 · Front entry, Scottsdale</option>
-          <option value="1">Q-26-2418 · Patio pair, dealer order</option>
-          <option value="2">Q-26-2419 · Tall custom, Paradise Valley</option>
-        </select></div>
-      <div class="qt"><span class="qt-l">Quote total</span><span class="qt-v" id="qtv"></span></div>
-      <button class="btn ghost" type="button" id="playDemo"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>Play demo</button>
-      <button class="btn primary" type="button" id="openDoc"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg>Preview quote</button>
+<div class="app">
+  <header class="chrome">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="5" y="3" width="14" height="18" rx=".5"/><path d="M9.5 3v18M14.5 3v18M5 12h14"/></svg></span><b>DoorIQ</b></div>
+    <nav class="modnav" aria-label="Modules">
+      <button type="button" class="cur" aria-current="page">Quotes</button>
+      <button type="button" data-mod="Products">Products</button>
+      <button type="button" data-mod="Price lists">Price lists</button>
+      <button type="button" data-mod="Rules">Rules</button>
+      <button type="button" data-mod="Production">Production</button>
+      <button type="button" data-mod="Reports">Reports</button>
+    </nav>
+    <div class="chrome-r">
+      <div class="org"><b>Saguaro Iron Works</b>Phoenix plant</div>
+      <span class="avatar" title="Shlok Mistry">SM</span>
     </div>
   </header>
 
-  <div class="panes">
-    <!-- configuration -->
-    <aside class="side" aria-label="Configure door">
-      <div class="sec-h">Configure security door</div>
+  <section class="rec" aria-label="Quote record">
+    <div class="crumbs"><a href="#" onclick="return false">Quotes</a><span aria-hidden="true">/</span><span id="crumbNo"></span></div>
+    <div class="rec-top">
+      <div class="rec-title"><h1 id="recTitle"></h1><span class="badge" id="recBadge"></span></div>
+      <div class="rec-actions">
+        <select class="sel" id="job" aria-label="Open sample quote">
+          <option value="0">Q-26-2417 Front entry, Scottsdale</option>
+          <option value="1">Q-26-2418 Patio pair, dealer order</option>
+          <option value="2">Q-26-2419 Tall custom, Paradise Valley</option>
+        </select>
+        <button class="btn" type="button" id="playDemo"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>Play demo</button>
+        <button class="btn" type="button" id="openDoc">Preview quote</button>
+        <button class="btn primary" type="button" id="relBtn">Release quote</button>
+      </div>
+    </div>
+    <div class="rec-meta">
+      <div><span>Account</span><b id="mAcct"></b></div>
+      <div><span>Price list</span><b id="mList"></b></div>
+      <div><span>Owner</span><b>Shlok Mistry</b></div>
+      <div><span>Revision</span><b id="mRev"></b></div>
+      <div><span>Quote total</span><b id="mTotal" class="num"></b></div>
+      <div><span>Last saved</span><b id="mSaved"></b></div>
+    </div>
+    <div class="stepper" id="stepper" aria-label="Approval workflow"></div>
+  </section>
 
-      <section class="grp">
-        <div class="lbl">Opening type</div>
-        <div class="tiles" id="g-opening">
-          <button type="button" class="tile" data-v="single"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19" rx=".5"/><path d="M6 12h12M15.5 11v2"/></svg>Single</button>
-          <button type="button" class="tile" data-v="double"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="2.5" width="18" height="19" rx=".5"/><path d="M12 2.5v19M3 12h18M10 11v2M14 11v2"/></svg>Double</button>
-          <button type="button" class="tile" data-v="sidelite"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="2.5" width="18" height="19" rx=".5"/><path d="M8 2.5v19M8 12h13M18 11v2"/></svg>Door + sidelite</button>
-        </div>
-        <div class="field" id="sideWrap"><label for="sideW">Sidelite width</label><input class="inp" id="sideW" inputmode="decimal"></div>
-      </section>
+  <div class="body">
+    <aside class="rail" aria-label="Configuration">
+      <details class="sec" id="sec-open" open><summary><span class="n">1</span><span class="t">Opening</span><span class="v" id="v-open"></span></summary>
+        <div class="sec-b">
+          <div class="opts" id="g-opening">
+            <button type="button" class="opt" data-v="single"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19"/><path d="M6 12h12M15.5 11v2"/></svg>Single</button>
+            <button type="button" class="opt" data-v="double"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="2.5" width="18" height="19"/><path d="M12 2.5v19M3 12h18"/></svg>Double</button>
+            <button type="button" class="opt" data-v="sidelite"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="2.5" width="18" height="19"/><path d="M8 2.5v19M8 12h13"/></svg>With sidelite</button>
+          </div>
+          <div class="fld" id="sideWrap"><label class="lbl" for="sideW">Sidelite width, inches</label><input class="inp" id="sideW" inputmode="decimal"></div>
+        </div></details>
 
-      <section class="grp">
-        <div class="lbl">Field measurements <em>inches</em></div>
-        <div class="r3">
-          <div class="field"><label for="wTop">Width · top</label><input class="inp" id="wTop" inputmode="decimal"></div>
-          <div class="field"><label for="wMid">Width · mid</label><input class="inp" id="wMid" inputmode="decimal"></div>
-          <div class="field"><label for="wBot">Width · bottom</label><input class="inp" id="wBot" inputmode="decimal"></div>
-        </div>
-        <div class="r2">
-          <div class="field"><label for="hL">Height · left</label><input class="inp" id="hL" inputmode="decimal"></div>
-          <div class="field"><label for="hR">Height · right</label><input class="inp" id="hR" inputmode="decimal"></div>
-        </div>
-        <span class="hint">Accepts 36 1/4, 36.25 or 3'0 1/4"</span>
-        <div class="note" id="measNote"></div>
-      </section>
+      <details class="sec" id="sec-meas" open><summary><span class="n">2</span><span class="t">Field measurements</span><span class="v" id="v-meas"></span></summary>
+        <div class="sec-b">
+          <div class="g3">
+            <div class="fld"><label class="lbl" for="wTop">Width top</label><input class="inp" id="wTop" inputmode="decimal"></div>
+            <div class="fld"><label class="lbl" for="wMid">Width middle</label><input class="inp" id="wMid" inputmode="decimal"></div>
+            <div class="fld"><label class="lbl" for="wBot">Width bottom</label><input class="inp" id="wBot" inputmode="decimal"></div>
+          </div>
+          <div class="g2">
+            <div class="fld"><label class="lbl" for="hL">Height left</label><input class="inp" id="hL" inputmode="decimal"></div>
+            <div class="fld"><label class="lbl" for="hR">Height right</label><input class="inp" id="hR" inputmode="decimal"></div>
+          </div>
+          <span class="hint">Accepts 36 1/4, 36.25 or 3'0 1/4"</span>
+          <div class="msg" id="measNote"></div>
+        </div></details>
 
-      <section class="grp">
-        <div class="lbl">Mounting</div>
-        <div class="cards" id="g-mount">
-          <button type="button" class="card" data-v="zbar"><b>Z-bar surface mount</b><span class="tag">Overlaps opening 1" · hides gaps · out-swing only</span></button>
-          <button type="button" class="card" data-v="flush"><b>Flush in opening</b><span class="tag">Sits inside the jamb · in- or out-swing</span></button>
-        </div>
-      </section>
+      <details class="sec" id="sec-frame" open><summary><span class="n">3</span><span class="t">Frame and swing</span><span class="v" id="v-frame"></span></summary>
+        <div class="sec-b">
+          <div class="rows" id="g-mount">
+            <button type="button" class="row-opt" data-v="zbar"><span class="rd"></span><b>Z-bar surface mount</b><span class="p">FRM-ZBAR</span><span class="d">Overlaps the opening 1" and hides gaps. Out-swing only.</span></button>
+            <button type="button" class="row-opt" data-v="flush"><span class="rd"></span><b>Flush in opening</b><span class="p">FRM-ANG</span><span class="d">Sits inside the jamb. In- or out-swing.</span></button>
+          </div>
+          <div class="g2">
+            <div class="segs" id="g-swing"><button type="button" data-v="out">Out-swing</button><button type="button" data-v="in">In-swing</button></div>
+            <div class="segs" id="g-hand"><button type="button" data-v="LH">Left hand</button><button type="button" data-v="RH">Right hand</button></div>
+          </div>
+          <span class="hint">Hand is read from the exterior. Left hand means hinges on the left.</span>
+        </div></details>
 
-      <section class="grp">
-        <div class="lbl">Swing &amp; hand <em>exterior view</em></div>
-        <div class="r2">
-          <div class="segs" id="g-swing"><button type="button" data-v="out">Out-swing</button><button type="button" data-v="in">In-swing</button></div>
-          <div class="segs" id="g-hand"><button type="button" data-v="LH">LH</button><button type="button" data-v="RH">RH</button></div>
-        </div>
-      </section>
+      <details class="sec" id="sec-style" open><summary><span class="n">4</span><span class="t">Design</span><span class="v" id="v-style"></span></summary>
+        <div class="sec-b">
+          <div class="opts" id="g-style">
+            <button type="button" class="opt" data-v="classic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19"/><path d="M9 3v18M12 3v18M15 3v18"/></svg>Classic picket</button>
+            <button type="button" class="opt" data-v="modern"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19"/><path d="M6 7h12M6 11h12M6 15h12M6 19h12"/></svg>Modern horizontal</button>
+            <button type="button" class="opt" data-v="scroll"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19"/><path d="M6 13h12M9 13v8M12 13v8M15 13v8M12 4.5a2 2 0 1 0 0 4a2 2 0 1 1 0 4M12 4.5a2 2 0 1 1 0 4a2 2 0 1 0 0 4"/></svg>Desert scroll</button>
+          </div>
+        </div></details>
 
-      <section class="grp">
-        <div class="lbl">Design style</div>
-        <div class="tiles" id="g-style">
-          <button type="button" class="tile" data-v="classic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19" rx=".5"/><path d="M9 3v18M12 3v18M15 3v18"/></svg>Classic picket</button>
-          <button type="button" class="tile" data-v="modern"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19" rx=".5"/><path d="M6 7h12M6 11h12M6 15h12M6 19h12"/></svg>Modern horizontal</button>
-          <button type="button" class="tile" data-v="scroll"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="2.5" width="12" height="19" rx=".5"/><path d="M6 13h12M9 13v8M12 13v8M15 13v8M12 4.5a2 2 0 1 0 0 4a2 2 0 1 1 0 4M12 4.5a2 2 0 1 1 0 4a2 2 0 1 0 0 4"/></svg>Desert scroll</button>
-        </div>
-      </section>
+      <details class="sec" id="sec-mesh" open><summary><span class="n">5</span><span class="t">Screen</span><span class="v" id="v-mesh"></span></summary>
+        <div class="sec-b">
+          <div class="rows" id="g-mesh">
+            <button type="button" class="row-opt" data-v="ss"><span class="rd"></span><b>Stainless security mesh</b><span class="p">12×12</span><span class="d">0.035" wire, resists cutting and prying.</span></button>
+            <button type="button" class="row-opt" data-v="sol"><span class="rd"></span><b>Solar screen</b><span class="p">80%</span><span class="d">Cuts heat and glare, daytime privacy.</span></button>
+            <button type="button" class="row-opt" data-v="ins"><span class="rd"></span><b>Insect screen</b><span class="p">FG</span><span class="d">Fiberglass, lowest cost.</span></button>
+            <button type="button" class="row-opt" data-v="none"><span class="rd"></span><b>No screen</b><span class="p">—</span><span class="d">Open bars only.</span></button>
+          </div>
+        </div></details>
 
-      <section class="grp">
-        <div class="lbl">Screen</div>
-        <div class="cards" id="g-mesh">
-          <button type="button" class="card" data-v="ss"><b>Stainless security mesh</b><span class="tag">12×12 · 0.035" wire · cut and pry resistant</span></button>
-          <button type="button" class="card" data-v="sol"><b>Solar screen 80%</b><span class="tag">Blocks heat and glare · daytime privacy</span></button>
-          <button type="button" class="card" data-v="ins"><b>Insect screen</b><span class="tag">Fiberglass · lowest cost</span></button>
-          <button type="button" class="card" data-v="none"><b>No screen</b><span class="tag">Open bars only</span></button>
-        </div>
-      </section>
+      <details class="sec" id="sec-fin" open><summary><span class="n">6</span><span class="t">Finish</span><span class="v" id="v-fin"></span></summary>
+        <div class="sec-b"><div class="sws" id="g-color"></div></div></details>
 
-      <section class="grp">
-        <div class="lbl">Powder coat finish</div>
-        <div class="swatches" id="g-color"></div>
-      </section>
+      <details class="sec" id="sec-hw" open><summary><span class="n">7</span><span class="t">Hardware</span><span class="v" id="v-hw"></span></summary>
+        <div class="sec-b">
+          <div class="rows" id="g-lock">
+            <button type="button" class="row-opt" data-v="sc"><span class="rd"></span><b>Single-cylinder deadbolt</b><span class="p">LCK-SC</span><span class="d">Thumb-turn inside, free exit.</span></button>
+            <button type="button" class="row-opt" data-v="dc"><span class="rd"></span><b>Double-cylinder deadbolt</b><span class="p">LCK-DC</span><span class="d">Keyed both sides. Check egress.</span></button>
+          </div>
+          <label class="lbl">Closer</label>
+          <div class="segs" id="g-closer"><button type="button" data-v="none">None</button><button type="button" data-v="pn">Pneumatic</button><button type="button" data-v="hy">Hydraulic</button></div>
+        </div></details>
 
-      <section class="grp">
-        <div class="lbl">Lock</div>
-        <div class="cards" id="g-lock">
-          <button type="button" class="card" data-v="sc"><b>Single-cylinder deadbolt</b><span class="tag">Thumb-turn inside · free exit</span></button>
-          <button type="button" class="card" data-v="dc"><b>Double-cylinder deadbolt</b><span class="tag">Keyed both sides · no reach-through</span></button>
-        </div>
-        <div class="lbl" style="margin-top:4px">Closer</div>
-        <div class="segs" id="g-closer"><button type="button" data-v="none">None</button><button type="button" data-v="pn">Pneumatic</button><button type="button" data-v="hy">Hydraulic</button></div>
-      </section>
+      <details class="sec" id="sec-optn" open><summary><span class="n">8</span><span class="t">Options</span><span class="v" id="v-optn"></span></summary>
+        <div class="sec-b">
+          <label class="tgl" for="kick"><span>Kickplate<small>10" steel, each leaf</small></span><input type="checkbox" id="kick"><span class="k"></span></label>
+          <label class="tgl" for="pet"><span>Pet door<small>Medium, welded frame</small></span><input type="checkbox" id="pet"><span class="k"></span></label>
+          <label class="tgl" for="install"><span>Installation<small>Crew install and haul-away</small></span><input type="checkbox" id="install"><span class="k"></span></label>
+        </div></details>
 
-      <section class="grp">
-        <div class="lbl">Options</div>
-        <div class="toggles">
-          <label class="tg" for="kick"><span>Kickplate<small>10" steel, each leaf</small></span><input type="checkbox" id="kick"><span class="sl"></span></label>
-          <label class="tg" for="pet"><span>Pet door<small>Medium, welded frame</small></span><input type="checkbox" id="pet"><span class="sl"></span></label>
-          <label class="tg" for="install"><span>Installation<small>Crew install + haul-away</small></span><input type="checkbox" id="install"><span class="sl"></span></label>
-        </div>
-      </section>
-
-      <section class="grp">
-        <div class="lbl">Customer &amp; pricing</div>
-        <div class="field"><label for="acct">Account · price list</label>
-          <select class="inp" id="acct">
-            <option value="retail">Walk-in retail · List</option>
-            <option value="dealer">Desert Shield Screens · Dealer</option>
-            <option value="builder">Sonoran Ridge Homes · Builder</option>
-          </select></div>
-        <div class="field"><label for="disc">Line discount %</label><input class="inp" id="disc" inputmode="decimal"></div>
-        <span class="hint">Quotes under the 22% margin floor route to a manager.</span>
-      </section>
+      <details class="sec" id="sec-price" open><summary><span class="n">9</span><span class="t">Account and pricing</span><span class="v" id="v-price"></span></summary>
+        <div class="sec-b">
+          <div class="fld"><label class="lbl" for="acct">Account</label>
+            <select class="inp" id="acct">
+              <option value="retail">Walk-in retail</option>
+              <option value="dealer">Desert Shield Screens (dealer)</option>
+              <option value="builder">Sonoran Ridge Homes (builder)</option>
+            </select></div>
+          <div class="fld"><label class="lbl" for="disc">Line discount %</label><input class="inp" id="disc" inputmode="decimal"></div>
+          <span class="hint">Quotes under the 22% margin floor need sales manager approval.</span>
+        </div></details>
     </aside>
 
-    <!-- stage -->
-    <main class="stage" aria-label="Product preview">
-      <span class="calc" id="calc"><i></i><span id="calcTxt"></span></span>
-      <div class="scene">
-        <div id="art" style="width:100%"></div>
-        <span class="dimpill" id="dimpill"></span>
-        <div class="viewbar">
-          <button type="button" class="chipbtn sel" id="vSwing">Swing lines</button>
-          <button type="button" class="chipbtn sel" id="vEntry">Entry door behind</button>
+    <main class="center" aria-label="Drawing and specification">
+      <section class="sheet" aria-labelledby="shH">
+        <div class="sheet-bar">
+          <h2 id="shH">Shop drawing</h2><span class="hint">Exterior elevation, not to scale</span>
+          <div class="r">
+            <button type="button" class="tog on" id="tDim" aria-pressed="true">Dimensions</button>
+            <button type="button" class="tog on" id="tSwing" aria-pressed="true">Swing</button>
+            <button type="button" class="tog on" id="tCall" aria-pressed="true">Callouts</button>
+          </div>
         </div>
-      </div>
-      <section class="perf" aria-label="Door specification">
-        <div class="perf-h"><span>Door specification</span><em id="perfTag"></em></div>
-        <div class="kpis">
-          <div class="kpi"><b id="kSec"></b><span>Security</span></div>
-          <div class="kpi"><b id="kWt"></b><span>Weight lb</span></div>
-          <div class="kpi"><b id="kLead"></b><span>Lead days</span></div>
-          <div class="kpi"><b id="kShip"></b><span>Ships</span></div>
-        </div>
-        <div class="badges" id="badges"></div>
-        <div class="leaflist" id="leaves"></div>
+        <div class="draw" id="art"></div>
+        <div class="tblock" id="tblock"></div>
+      </section>
+      <section class="specs" aria-labelledby="spH">
+        <h2 id="spH">Specification <span id="specSub"></span></h2>
+        <dl class="kv" id="kv"></dl>
       </section>
     </main>
 
-    <!-- documents -->
-    <section class="right" aria-label="Quote documents">
+    <section class="panel" aria-label="Quote data">
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true" aria-controls="p-bom" id="t-bom" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>BOM</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p-cut" id="t-cut" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>Cut list</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p-route" id="t-route" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 6h7a3 3 0 0 1 0 6H10a3 3 0 0 0 0 6h7"/></svg>Routing</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p-rules" id="t-rules" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>Rules</button>
-        <button class="tab" role="tab" aria-selected="false" aria-controls="p-quote" id="t-quote" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/></svg>Quote</button>
+        <button class="tab" role="tab" id="t-bom" aria-controls="p-bom" aria-selected="true" type="button">Bill of materials <span class="cnt" id="c-bom"></span></button>
+        <button class="tab" role="tab" id="t-cut" aria-controls="p-cut" aria-selected="false" type="button">Cut list <span class="cnt" id="c-cut"></span></button>
+        <button class="tab" role="tab" id="t-route" aria-controls="p-route" aria-selected="false" type="button">Routing</button>
+        <button class="tab" role="tab" id="t-rules" aria-controls="p-rules" aria-selected="false" type="button">Rules <span class="cnt" id="c-rules"></span></button>
+        <button class="tab" role="tab" id="t-price" aria-controls="p-price" aria-selected="false" type="button">Pricing</button>
+        <button class="tab" role="tab" id="t-log" aria-controls="p-log" aria-selected="false" type="button">Activity</button>
       </div>
-      <div class="status" id="status"></div>
-      <div class="tabbody">
-        <div class="panel" role="tabpanel" id="p-bom" aria-labelledby="t-bom"></div>
-        <div class="panel" role="tabpanel" id="p-cut" aria-labelledby="t-cut" hidden></div>
-        <div class="panel" role="tabpanel" id="p-route" aria-labelledby="t-route" hidden></div>
-        <div class="panel" role="tabpanel" id="p-rules" aria-labelledby="t-rules" hidden></div>
-        <div class="panel" role="tabpanel" id="p-quote" aria-labelledby="t-quote" hidden></div>
+      <div class="alert msg" id="alert"></div>
+      <div class="tbody">
+        <div class="pane" role="tabpanel" id="p-bom" aria-labelledby="t-bom"></div>
+        <div class="pane" role="tabpanel" id="p-cut" aria-labelledby="t-cut" hidden></div>
+        <div class="pane" role="tabpanel" id="p-route" aria-labelledby="t-route" hidden></div>
+        <div class="pane" role="tabpanel" id="p-rules" aria-labelledby="t-rules" hidden></div>
+        <div class="pane" role="tabpanel" id="p-price" aria-labelledby="t-price" hidden></div>
+        <div class="pane" role="tabpanel" id="p-log" aria-labelledby="t-log" hidden></div>
       </div>
     </section>
   </div>
+
+  <footer class="statusbar" aria-label="Status">
+    <span class="ok" id="sbCalc"></span>
+    <span id="sbRules"></span>
+    <span id="sbList"></span>
+    <span class="r">Sample company, parts and prices are fictional · Demo by Analytics with Shlok</span>
+  </footer>
 </div>
 </div>
 
-<div class="dcur" id="dcur" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M5 3l13.5 8.2-6 1.4 3.4 6.6-2.6 1.3-3.4-6.6L5.5 17.6z" fill="#1a1917" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+<div class="dcur" id="dcur" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M5 3l13.5 8.2-6 1.4 3.4 6.6-2.6 1.3-3.4-6.6L5.5 17.6z" fill="#1E211A" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
 <div class="dcap" id="dcap" aria-live="polite"></div>
 <div class="dcard" id="dcard" hidden></div>
 
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-label="Quote preview">
   <div class="doc">
-    <div class="doc-bar"><span>Customer-facing quote · what the PDF export produces in the full build</span>
-      <div style="display:flex;gap:8px"><button class="btn ghost" type="button" id="copyDoc">Copy as text</button><button class="btn" type="button" id="closeDoc">Close</button></div></div>
+    <div class="doc-bar"><span>Customer copy. In the full build this exports to PDF and emails from DoorIQ.</span>
+      <div style="display:flex;gap:8px"><button class="btn" type="button" id="copyDoc">Copy as text</button><button class="btn" type="button" id="closeDoc">Close</button></div></div>
     <div class="doc-in" id="docIn"></div>
   </div>
 </div>
@@ -465,65 +494,68 @@ body.demo #playDemo{visibility:hidden}
 const $=id=>document.getElementById(id);
 const STOCK=288, KERF=0.125, FLOOR=0.22, TAX=0.086;
 const ACCT={
-  retail:{name:'Walk-in retail',list:'List',t:.45,tax:true,bill:'Walk-in customer',addr:'Scottsdale, AZ'},
-  dealer:{name:'Desert Shield Screens',list:'Dealer',t:.32,tax:false,bill:'Desert Shield Screens (sample dealer)',addr:'Mesa, AZ · resale certificate on file'},
-  builder:{name:'Sonoran Ridge Homes',list:'Builder',t:.28,tax:true,bill:'Sonoran Ridge Homes (sample builder)',addr:'Buckeye, AZ · Lot 114'}
+  retail:{name:'Walk-in retail',list:'Retail 2026-Q4',t:.45,tax:true,bill:'Walk-in customer',addr:'Scottsdale, AZ'},
+  dealer:{name:'Desert Shield Screens',list:'Dealer 2026-Q4',t:.32,tax:false,bill:'Desert Shield Screens (sample dealer)',addr:'Mesa, AZ. Resale certificate on file.'},
+  builder:{name:'Sonoran Ridge Homes',list:'Builder contract SRH-26',t:.28,tax:true,bill:'Sonoran Ridge Homes (sample builder)',addr:'Buckeye, AZ. Lot 114.'}
 };
 const FIN={
-  black:{n:'Textured black',hex:'#2b2b2a',code:'RAL 9005 T'},
-  bronze:{n:'Oil-rubbed bronze',hex:'#4a3a2c',code:'Std. bronze'},
-  sand:{n:'Desert sand',hex:'#b59e79',code:'Std. sand'},
-  white:{n:'Gloss white',hex:'#ebeae5',code:'RAL 9016'},
-  custom:{n:'Custom RAL',hex:'#4f5a3a',code:'RAL 6003'}
+  black:{n:'Textured black',hex:'#2B2B2A',code:'RAL 9005 T'},
+  bronze:{n:'Oil-rubbed bronze',hex:'#4A3A2C',code:'SIW-BRZ'},
+  sand:{n:'Desert sand',hex:'#B59E79',code:'SIW-SND'},
+  white:{n:'Gloss white',hex:'#EBEAE5',code:'RAL 9016'},
+  custom:{n:'Custom olive',hex:'#4F5A3A',code:'RAL 6003'}
 };
 const P={
- tube:{pn:'TUBE-1X2-16GA',d:'Steel tube 1"×2" 16 ga · 24\' stick',u:'STK',c:26.40,g:'Panel',lbft:1.05},
- pick:{pn:'PICK-050SQ',d:'Solid square picket 1/2" · 24\' stick',u:'STK',c:10.10,g:'Infill',lbft:0.85},
- hbar:{pn:'TUBE-1X1-16GA',d:'Steel tube 1"×1" 16 ga · 24\' stick',u:'STK',c:16.80,g:'Infill',lbft:0.55},
- zbar:{pn:'FRM-ZBAR-16GA',d:'Z-bar surface-mount frame · 24\' stick',u:'STK',c:31.20,g:'Frame',lbft:1.30},
- flush:{pn:'FRM-ANG-150',d:'Flush-mount angle frame 1-1/2" · 24\' stick',u:'STK',c:22.80,g:'Frame',lbft:1.10},
- scroll:{pn:'CST-SCRL-DS',d:'Desert scroll casting · cast steel',u:'EA',c:14.50,g:'Infill'},
- ss:{pn:'MESH-SS12-035',d:'Stainless security mesh 12×12 · 0.035"',u:'SF',c:7.80,g:'Screen'},
- sol:{pn:'MESH-SOL80',d:'Solar screen fabric · 80% shade',u:'SF',c:1.10,g:'Screen'},
+ tube:{pn:'TUBE-1X2-16GA',d:'Steel tube 1"×2" 16 ga, 24\' stick',u:'STK',c:26.40,g:'Panel',lbft:1.05},
+ pick:{pn:'PICK-050SQ',d:'Solid square picket 1/2", 24\' stick',u:'STK',c:10.10,g:'Infill',lbft:0.85},
+ hbar:{pn:'TUBE-1X1-16GA',d:'Steel tube 1"×1" 16 ga, 24\' stick',u:'STK',c:16.80,g:'Infill',lbft:0.55},
+ zbar:{pn:'FRM-ZBAR-16GA',d:'Z-bar surface-mount frame, 24\' stick',u:'STK',c:31.20,g:'Frame',lbft:1.30},
+ flush:{pn:'FRM-ANG-150',d:'Flush-mount angle frame 1-1/2", 24\' stick',u:'STK',c:22.80,g:'Frame',lbft:1.10},
+ scroll:{pn:'CST-SCRL-DS',d:'Desert scroll casting, cast steel',u:'EA',c:14.50,g:'Infill'},
+ ss:{pn:'MESH-SS12-035',d:'Stainless security mesh 12×12, 0.035"',u:'SF',c:7.80,g:'Screen'},
+ sol:{pn:'MESH-SOL80',d:'Solar screen fabric, 80% shade',u:'SF',c:1.10,g:'Screen'},
  ins:{pn:'MESH-FG18',d:'Fiberglass insect screen 18×16',u:'SF',c:0.55,g:'Screen'},
- ret:{pn:'SCR-RET-AL',d:'Screen retainer bar · aluminum',u:'LF',c:0.85,g:'Screen'},
- hinge:{pn:'HNG-WLD-HD',d:'Weld-on barrel hinge · heavy duty',u:'EA',c:6.25,g:'Hardware'},
- lockbox:{pn:'LBX-WLD-238',d:'Weld-in lockbox · 2-3/8" backset',u:'EA',c:9.80,g:'Hardware'},
- lsc:{pn:'LCK-SC-SET',d:'Lever + single-cylinder deadbolt',u:'SET',c:38.00,g:'Hardware'},
- ldc:{pn:'LCK-DC-SET',d:'Lever + double-cylinder deadbolt',u:'SET',c:46.00,g:'Hardware'},
- fbolt:{pn:'FBT-SET-12',d:'Flush bolt set · inactive leaf',u:'SET',c:12.40,g:'Hardware'},
- astr:{pn:'AST-STL-96',d:'Steel astragal · cut to height',u:'EA',c:18.00,g:'Hardware'},
+ ret:{pn:'SCR-RET-AL',d:'Screen retainer bar, aluminum',u:'LF',c:0.85,g:'Screen'},
+ hinge:{pn:'HNG-WLD-HD',d:'Weld-on barrel hinge, heavy duty',u:'EA',c:6.25,g:'Hardware'},
+ lockbox:{pn:'LBX-WLD-238',d:'Weld-in lockbox, 2-3/8" backset',u:'EA',c:9.80,g:'Hardware'},
+ lsc:{pn:'LCK-SC-SET',d:'Lever and single-cylinder deadbolt',u:'SET',c:38.00,g:'Hardware'},
+ ldc:{pn:'LCK-DC-SET',d:'Lever and double-cylinder deadbolt',u:'SET',c:46.00,g:'Hardware'},
+ fbolt:{pn:'FBT-SET-12',d:'Flush bolt set, inactive leaf',u:'SET',c:12.40,g:'Hardware'},
+ astr:{pn:'AST-STL-96',d:'Steel astragal, cut to height',u:'EA',c:18.00,g:'Hardware'},
  pn:{pn:'CLS-PNU-STD',d:'Pneumatic door closer',u:'EA',c:16.00,g:'Hardware'},
- hy:{pn:'CLS-HYD-HO',d:'Hydraulic closer · hold-open',u:'EA',c:42.00,g:'Hardware'},
- kick:{pn:'KPL-10-16GA',d:'Kickplate 10" · 16 ga steel',u:'EA',c:13.50,g:'Hardware'},
- pet:{pn:'PET-MD-WLD',d:'Pet door insert · medium · weld-in',u:'EA',c:64.00,g:'Hardware'},
- sweep:{pn:'SWP-AL-VNL',d:'Door sweep · aluminum + vinyl',u:'EA',c:4.20,g:'Hardware'},
- fast:{pn:'KIT-TAMPER',d:'Tamper-proof screws + anchors kit',u:'KIT',c:6.50,g:'Hardware'},
- coat:{pn:'SVC-PC-PANEL',d:'Powder coat · panel',u:'EA',c:28.00,g:'Finish'},
- coatF:{pn:'SVC-PC-FRAME',d:'Powder coat · frame',u:'EA',c:14.00,g:'Finish'},
+ hy:{pn:'CLS-HYD-HO',d:'Hydraulic closer with hold-open',u:'EA',c:42.00,g:'Hardware'},
+ kick:{pn:'KPL-10-16GA',d:'Kickplate 10", 16 ga steel',u:'EA',c:13.50,g:'Hardware'},
+ pet:{pn:'PET-MD-WLD',d:'Pet door insert, medium, weld-in',u:'EA',c:64.00,g:'Hardware'},
+ sweep:{pn:'SWP-AL-VNL',d:'Door sweep, aluminum and vinyl',u:'EA',c:4.20,g:'Hardware'},
+ fast:{pn:'KIT-TAMPER',d:'Tamper-proof screws and anchors kit',u:'KIT',c:6.50,g:'Hardware'},
+ coat:{pn:'SVC-PC-PANEL',d:'Powder coat, panel',u:'EA',c:28.00,g:'Finish'},
+ coatF:{pn:'SVC-PC-FRAME',d:'Powder coat, frame',u:'EA',c:14.00,g:'Finish'},
  setup:{pn:'SVC-PC-SETUP',d:'Custom color batch setup',u:'LOT',c:85.00,g:'Finish'},
- crate:{pn:'PK-CRATE-DR',d:'Door crate · corrugated + slats',u:'EA',c:18.00,g:'Packing'},
- corner:{pn:'PK-FOAM-CNR',d:'Foam corner protectors · set of 4',u:'SET',c:2.40,g:'Packing'},
- inst:{pn:'SVC-INST-CREW',d:'Installation crew · per opening',u:'JOB',c:120.00,g:'Services'}
+ crate:{pn:'PK-CRATE-DR',d:'Door crate, corrugated with slats',u:'EA',c:18.00,g:'Packing'},
+ corner:{pn:'PK-FOAM-CNR',d:'Foam corner protectors, set of 4',u:'SET',c:2.40,g:'Packing'},
+ inst:{pn:'SVC-INST-CREW',d:'Installation crew, per opening',u:'JOB',c:120.00,g:'Services'}
 };
 const GROUPS=['Frame','Panel','Infill','Screen','Hardware','Finish','Packing','Services'];
 const WC={
- 'SAW-01':{n:'Cold saw · cut to length',rate:48},'PUN-01':{n:'Ironworker · punch rails',rate:48},
- 'WLD-02':{n:'MIG weld cell · fixture',rate:62},'GRD-01':{n:'Grind & surface prep',rate:46},
- 'PCL-01':{n:'Powder coat line',rate:55},'MSH-01':{n:'Mesh & retainer install',rate:46},
- 'ASY-01':{n:'Hardware & assembly',rate:50},'QC-01':{n:'Final inspection & pack',rate:50}
+ 'SAW-01':{n:'Cold saw, cut to length',rate:48},'PUN-01':{n:'Ironworker, punch rails',rate:48},
+ 'WLD-02':{n:'MIG weld cell, fixture',rate:62},'GRD-01':{n:'Grind and surface prep',rate:46},
+ 'PCL-01':{n:'Powder coat line',rate:55},'MSH-01':{n:'Mesh and retainer install',rate:46},
+ 'ASY-01':{n:'Hardware and assembly',rate:50},'QC-01':{n:'Final inspection and pack',rate:50}
 };
 const PRESETS=[
  {opening:'single',sideW:'12',wTop:'36 1/4',wMid:'36 1/8',wBot:'36 1/4',hL:'80 1/8',hR:'80 1/4',mount:'zbar',swing:'out',hand:'LH',style:'scroll',mesh:'ss',color:'black',lock:'sc',closer:'pn',kick:false,pet:false,install:true,acct:'retail',disc:'0'},
  {opening:'double',sideW:'12',wTop:'72',wMid:'71 7/8',wBot:'72',hL:'82',hR:'81 15/16',mount:'zbar',swing:'out',hand:'RH',style:'modern',mesh:'sol',color:'bronze',lock:'sc',closer:'hy',kick:true,pet:false,install:false,acct:'dealer',disc:'5'},
  {opening:'single',sideW:'12',wTop:'38',wMid:'37 5/8',wBot:'38 1/4',hL:'90 1/4',hR:'90',mount:'flush',swing:'out',hand:'RH',style:'classic',mesh:'ss',color:'custom',lock:'dc',closer:'hy',kick:true,pet:true,install:true,acct:'retail',disc:'30'}
 ];
-const QNO=['Q-26-2417','Q-26-2418','Q-26-2419'];
-
-const S={view:{swing:true,entry:true},job:0};
+const JOBS=[
+ {no:'Q-26-2417',title:'Front entry, Scottsdale',rev:'A',created:'09:12'},
+ {no:'Q-26-2418',title:'Patio pair, dealer order',rev:'B',created:'08:40'},
+ {no:'Q-26-2419',title:'Tall custom, Paradise Valley',rev:'C',created:'07:55'}
+];
+const S={view:{dim:true,swing:true,call:true},job:0,events:[[],[],[]],sent:[false,false,false],requested:[false,false,false],saved:new Date()};
 let cfg={};
 
-/* ---------- helpers ---------- */
+/* helpers */
 function frac(x){
   if(!isFinite(x)) return '—';
   const s=x<0?'-':''; x=Math.abs(x);
@@ -533,7 +565,7 @@ function frac(x){
   let n=r,d=16; while(n%2===0){n/=2;d/=2}
   return s+(w?w+' ':'')+n+'/'+d+'"';
 }
-function ftin(x){const f=Math.floor(x/12+1e-9); return f+"'"+frac(x-f*12)}
+function ftin(x){const f=Math.floor(x/12+1e-9); return f+"'-"+frac(x-f*12)}
 function parseIn(str){
   let s=String(str==null?'':str).trim().replace(/[″”]/g,'"').replace(/[′’]/g,"'");
   if(!s) return NaN;
@@ -546,15 +578,15 @@ function parseIn(str){
   return ft*12+(m[1]?parseFloat(m[1]):0)+(m[2]?(+m[2])/(+m[3]):0);
 }
 const usd=v=>(v<0?'−':'')+'$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-const usd0=v=>'$'+Math.round(v).toLocaleString('en-US');
 const pct=v=>(v*100).toFixed(1)+'%';
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function shade(hex,p){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const t=p<0?0:255,a=Math.abs(p);r=Math.round((t-r)*a+r);g=Math.round((t-g)*a+g);b=Math.round((t-b)*a+b);return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)}
 function addBiz(n){const d=new Date(); let k=0; while(k<n){d.setDate(d.getDate()+1); const w=d.getDay(); if(w&&w<6) k++} return d}
 const fmtD=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 const fmtDL=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const hhmm=d=>d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
 
-/* ---------- engine ---------- */
+/* engine */
 function nest(list){
   const items=[]; list.forEach(p=>{for(let i=0;i<p.qty;i++) items.push({label:p.label,len:p.len})});
   items.sort((a,b)=>b.len-a.len);
@@ -566,13 +598,11 @@ function nest(list){
   });
   return bins;
 }
-
 function compute(c){
   const rules=[];
   const rule=(id,name,status,detail)=>rules.push({id,name,status,detail});
   const meas=[c.wTop,c.wMid,c.wBot,c.hL,c.hR].map(parseIn);
-  const valid=meas.every(v=>isFinite(v)&&v>0);
-  if(!valid) return {valid:false};
+  if(!meas.every(v=>isFinite(v)&&v>0)) return {valid:false};
   const [wt,wm,wb,hl,hr]=meas;
   const W=Math.min(wt,wm,wb), H=Math.min(hl,hr);
   const sq=Math.max(Math.max(wt,wm,wb)-W, Math.abs(hl-hr));
@@ -588,20 +618,18 @@ function compute(c){
   const acct=ACCT[c.acct], t=acct.t;
   const disc=Math.max(0,Math.min(40,parseFloat(c.disc)||0))/100;
 
-  // rules (all evaluated, in order)
-  rule('R-101','Leaf width within 24"–42"', lw<24||lw>42?'block':'pass', lw<24?`Leaf is ${frac(lw)}, under the 24" minimum.`:lw>42?`Leaf is ${frac(lw)}. Over 42" a welded leaf sags; quote a double door.`:`Leaf is ${frac(lw)}.`);
-  rule('R-102','Leaf height within 74"–96"', pH<74||pH>96?'block':'pass', pH>96?`Leaf is ${frac(pH)}. Taller openings need an engineered transom.`:pH<74?`Leaf is ${frac(pH)}, under the 74" minimum.`:`Leaf is ${frac(pH)}.`);
-  rule('R-103','Opening square within 3/8"', sq>0.75?'block':sq>0.375?'review':'pass', sq>0.75?`Out of square by ${frac(sq)}. Needs a shimmed custom frame and a site visit.`:sq>0.375?`Out of square by ${frac(sq)}. Built to smallest size; verify on site before cutting.`:`Deviation ${frac(sq)}.`);
+  rule('R-101','Leaf width 24" to 42"', lw<24||lw>42?'block':'pass', lw<24?`Leaf is ${frac(lw)}, under the 24" minimum.`:lw>42?`Leaf is ${frac(lw)}. Above 42" a welded leaf sags. Quote a double door.`:`Leaf is ${frac(lw)}.`);
+  rule('R-102','Leaf height 74" to 96"', pH<74||pH>96?'block':'pass', pH>96?`Leaf is ${frac(pH)}. Taller openings need an engineered transom.`:pH<74?`Leaf is ${frac(pH)}, under the 74" minimum.`:`Leaf is ${frac(pH)}.`);
+  rule('R-103','Opening square within 3/8"', sq>0.75?'block':sq>0.375?'review':'pass', sq>0.75?`Out of square by ${frac(sq)}. Needs a shimmed custom frame and a site visit.`:sq>0.375?`Out of square by ${frac(sq)}. Built to the smallest size. Verify on site before cutting.`:`Deviation ${frac(sq)}.`);
   rule('R-104','Z-bar frame requires out-swing', z&&c.swing==='in'?'block':'pass', z&&c.swing==='in'?'Z-bar mounts on the exterior face. Switch to flush mount or out-swing.':z?'Out-swing with Z-bar.':'Flush mount supports either swing.');
-  rule('R-105','Tall leaf adds 4th hinge + intermediate rail', pH>84?'auto':'pass', pH>84?`Applied automatically at ${frac(pH)} leaf height.`:'Not required under 84".');
-  rule('R-106','Egress: double-cylinder lock', c.lock==='dc'?'review':'pass', c.lock==='dc'?'Key needed to exit. Not allowed on bedroom egress doors (IRC R311). Confirm location.':'Single-cylinder allows free exit.');
+  rule('R-105','Tall leaf: 4th hinge and intermediate rail', pH>84?'auto':'pass', pH>84?`Added automatically at ${frac(pH)} leaf height.`:'Not required under 84".');
+  rule('R-106','Egress with double-cylinder lock', c.lock==='dc'?'review':'pass', c.lock==='dc'?'Key needed to exit. Not allowed on bedroom egress doors (IRC R311). Confirm location.':'Single-cylinder allows free exit.');
   rule('R-107','Pet door with security mesh', c.pet&&c.mesh==='ss'?'review':'pass', c.pet&&c.mesh==='ss'?'Lowers the security rating. Customer sign-off required.':'No conflict.');
-  if(c.opening==='sidelite') rule('R-108','Sidelite width within 10"–24"', !isFinite(side)||side<10||side>24?'block':'pass', isFinite(side)?`Sidelite is ${frac(side)}.`:'Enter a sidelite width.');
-  if(c.opening==='double') rule('R-109','Pair hardware: flush bolts + astragal', 'auto','Added to the inactive leaf automatically.');
-  if(c.opening==='double'&&c.closer!=='none') rule('R-110','Closer on active leaf only','info','Quoted one closer for the active leaf.');
-  rule('R-111','Custom color lead time', c.color==='custom'?'auto':'pass', c.color==='custom'?'+5 business days and $85 batch setup applied.':'Stock color.');
+  if(c.opening==='sidelite') rule('R-108','Sidelite width 10" to 24"', !isFinite(side)||side<10||side>24?'block':'pass', isFinite(side)?`Sidelite is ${frac(side)}.`:'Enter a sidelite width.');
+  if(c.opening==='double') rule('R-109','Pair hardware: flush bolts and astragal','auto','Added to the inactive leaf automatically.');
+  if(c.opening==='double'&&c.closer!=='none') rule('R-110','Closer on active leaf only','info','One closer quoted for the active leaf.');
+  rule('R-111','Custom color lead time', c.color==='custom'?'auto':'pass', c.color==='custom'?'5 business days and $85 batch setup added.':'Stock color.');
 
-  // panels & cut pieces
   const panels=leaves.map((w,i)=>({name:leaves.length>1?(i?'Leaf B':'Leaf A'):'Leaf',w,h:pH,kind:'leaf'}));
   if(c.opening==='sidelite'&&isFinite(side)) panels.push({name:'Sidelite',w:side-0.25,h:pH,kind:'side'});
   const pieces=[]; const cut=(mat,label,len,qty)=>{if(qty>0) pieces.push({mat,label,len,qty})};
@@ -613,29 +641,28 @@ function compute(c){
     cut('tube',`${p.name} rail`,iw,nR);
     if(c.style==='modern'){p.slats=Math.max(2,Math.floor(ih/6)-(nR-2)); cut('hbar',`${p.name} slat`,iw,p.slats)}
     else if(c.style==='classic'){p.pickets=Math.max(1,Math.ceil((iw-4)/4.5)); cut('pick',`${p.name} picket`,ih,p.pickets); holes+=p.pickets*(nR-2)}
-    else {p.pickets=Math.max(1,Math.ceil((iw-4)/4.5)); cut('pick',`${p.name} picket (lower)`,33,p.pickets); p.pairs=Math.max(1,Math.round(iw/13)); castings+=p.pairs*2}
+    else {p.pickets=Math.max(1,Math.ceil((iw-4)/4.5)); cut('pick',`${p.name} lower picket`,33,p.pickets); p.pairs=Math.max(1,Math.round(iw/13)); castings+=p.pairs*2}
   });
   const fm=z?'zbar':'flush';
   cut(fm,'Frame jamb',fH,2); cut(fm,'Frame header',fW,1);
   if(c.opening==='sidelite') cut(fm,'Mullion',fH-1,1);
   const long=pieces.filter(p=>p.len>STOCK||p.len<=0);
-  rule('R-112','Every cut fits a 24\' stick', long.length?'block':'pass', long.length?`${long[0].label} is ${frac(long[0].len)}.`:'Longest cut '+frac(Math.max(...pieces.map(p=>p.len)))+'.');
+  rule('R-112','Every cut fits 24\' stock', long.length?'block':'pass', long.length?`${long[0].label} is ${frac(long[0].len)}.`:'Longest cut '+frac(Math.max(...pieces.map(p=>p.len)))+'.');
   const mats={}; pieces.forEach(p=>(mats[p.mat]=mats[p.mat]||[]).push(p));
   const nests={}; Object.keys(mats).forEach(m=>nests[m]=nest(mats[m].filter(p=>p.len>0&&p.len<=STOCK)));
   const cuts=pieces.reduce((s,p)=>s+p.qty,0);
 
-  // BOM
-  const B=[]; const bom=(key,qty,bucket,qtxt)=>{if(qty>0) B.push({...P[key],key,qty,bucket,qtxt,ext:qty*P[key].c})};
+  const B=[]; const bom=(key,qty,bucket)=>{if(qty>0) B.push({...P[key],key,qty,bucket,ext:qty*P[key].c})};
   const nLeaf=leaves.length, nPan=panels.length, hinges=(pH>84?4:3)*nLeaf;
   bom(fm,nests[fm].length,'base');
   bom('tube',(nests.tube||[]).length,'base');
   if(nests.pick) bom('pick',nests.pick.length,'base');
   if(nests.hbar) bom('hbar',nests.hbar.length,'base');
   if(castings) bom('scroll',castings,'base');
-  let meshArea=0, retLF=0;
+  let meshArea=0;
   if(c.mesh!=='none'){
     meshArea=Math.ceil(panels.reduce((s,p)=>s+p.iw*p.ih/144,0)*1.08*10)/10;
-    retLF=Math.ceil(panels.reduce((s,p)=>s+2*(p.iw+p.ih)/12,0)*1.05);
+    const retLF=Math.ceil(panels.reduce((s,p)=>s+2*(p.iw+p.ih)/12,0)*1.05);
     bom(c.mesh,meshArea,'mesh'); bom('ret',retLF,'mesh');
   }
   bom('hinge',hinges,'base'); bom('lockbox',1,'base');
@@ -645,22 +672,19 @@ function compute(c){
   if(c.kick) bom('kick',nLeaf,'kick');
   if(c.pet) bom('pet',1,'pet');
   bom('sweep',nLeaf,'base'); bom('fast',1,'base');
-  const cm=c.color==='custom'?1.15:1;
   bom('coat',nPan,'base'); bom('coatF',1,'base');
   if(c.color==='custom'){
     bom('setup',1,'color');
-    const up=(nPan*P.coat.c+P.coatF.c)*(cm-1);
-    B.push({pn:'SVC-PC-CUSTOM',d:'Custom color coating upcharge · 15%',u:'LOT',c:up,g:'Finish',key:'cup',qty:1,bucket:'color',ext:up});
+    const up=(nPan*P.coat.c+P.coatF.c)*0.15;
+    B.push({pn:'SVC-PC-CUSTOM',d:'Custom color coating upcharge, 15%',u:'LOT',c:up,g:'Finish',key:'cup',qty:1,bucket:'color',ext:up});
   }
   bom('crate',1,'base'); bom('corner',nLeaf,'base');
   if(c.install){bom('inst',1,'install'); const l=B[B.length-1]; l.c=120+(c.opening==='double'?40:0)+(c.opening==='sidelite'?30:0); l.ext=l.c}
-  B.forEach(l=>{ if(!l.qtxt) l.qtxt=`${+l.qty.toFixed(2)} ${l.u} × ${usd(l.c)}` });
 
-  // routing
   const R=[]; const op=(wc,hrs,bucket)=>{if(hrs>0) R.push({wc,hrs,bucket})};
   op('SAW-01',0.15+0.04*cuts,'base');
   if(holes) op('PUN-01',0.1+0.015*holes,'base');
-  op('WLD-02',0.6*nPan+0.4+0.012*cuts*2,'base');
+  op('WLD-02',0.6*nPan+0.4+0.024*cuts,'base');
   op('GRD-01',0.25*nPan+0.15,'base');
   op('PCL-01',0.3*nPan+0.2,'base');
   if(c.mesh!=='none') op('MSH-01',0.35*nPan,'mesh');
@@ -670,24 +694,22 @@ function compute(c){
   R.forEach(o=>{o.hrs=Math.round(o.hrs*100)/100; o.ext=o.hrs*WC[o.wc].rate});
   const route={}; R.forEach(o=>{route[o.wc]=route[o.wc]||{hrs:0,ext:0}; route[o.wc].hrs+=o.hrs; route[o.wc].ext+=o.ext});
 
-  // cost buckets
   const bk={}; const add=(b,v)=>bk[b]=(bk[b]||0)+v;
   B.forEach(l=>add(l.bucket,l.ext)); R.forEach(o=>add(o.bucket,o.ext));
   const matCost=B.reduce((s,l)=>s+l.ext,0), labCost=R.reduce((s,o)=>s+o.ext,0), cost=matCost+labCost;
 
-  // quote lines
   const STY={classic:'Classic picket',modern:'Modern horizontal',scroll:'Desert scroll'};
-  const OPN={single:'Single',double:'Double',sidelite:'Door + sidelite'};
+  const OPN={single:'Single',double:'Double',sidelite:'Single with sidelite'};
   const MESH={ss:'Stainless security mesh 12×12',sol:'Solar screen, 80% shade',ins:'Fiberglass insect screen',none:''};
   const desc={
-    base:{t:`${OPN[c.opening]} security door · ${STY[c.style]}`,s:`${frac(fW)} × ${frac(fH)} · ${z?'Z-bar surface mount':'flush mount'} · ${c.swing}-swing ${c.hand} · ${FIN[c.color].n}`},
+    base:{t:`${OPN[c.opening]} security door, ${STY[c.style]}`,s:`${frac(fW)} × ${frac(fH)}, ${z?'Z-bar surface mount':'flush mount'}, ${c.swing}-swing ${c.hand}, ${FIN[c.color].n}`},
     mesh:{t:MESH[c.mesh],s:`${meshArea} sq ft with aluminum retainer`},
-    lock:{t:c.lock==='dc'?'Double-cylinder deadbolt + lever':'Single-cylinder deadbolt + lever',s:'Keyed lock, weld-in lockbox'},
+    lock:{t:c.lock==='dc'?'Double-cylinder deadbolt and lever':'Single-cylinder deadbolt and lever',s:'Keyed lock in weld-in lockbox'},
     closer:{t:c.closer==='hy'?'Hydraulic closer with hold-open':'Pneumatic closer',s:'Active leaf'},
     kick:{t:'10" steel kickplate',s:nLeaf>1?'Both leaves':'Bottom of leaf'},
-    pet:{t:'Pet door, medium',s:'Welded frame, flap insert'},
-    color:{t:`Custom color · ${FIN.custom.code}`,s:'Batch setup and coating upcharge'},
-    install:{t:'Professional installation',s:'Crew install, haul-away of old door'}
+    pet:{t:'Pet door, medium',s:'Welded frame with flap insert'},
+    color:{t:`Custom color ${FIN.custom.code}`,s:'Batch setup and coating upcharge'},
+    install:{t:'Professional installation',s:'Crew install and haul-away of old door'}
   };
   const lines=['base','mesh','lock','closer','kick','pet','color','install'].filter(b=>bk[b]).map(b=>({b,...desc[b],cost:bk[b],price:Math.round(bk[b]/(1-t))}));
   const subtotal=lines.reduce((s,l)=>s+l.price,0);
@@ -697,319 +719,358 @@ function compute(c){
   const tax=acct.tax?Math.round(taxable*TAX*100)/100:0;
   const total=net+tax;
   const margin=net>0?(net-cost)/net:0;
-  rule('R-120','Margin at or above 22% floor', margin<FLOOR?'review':'pass', margin<FLOOR?`Margin ${pct(margin)} after ${Math.round(disc*100)}% discount. Routes to sales manager for approval.`:`Margin ${pct(margin)} on ${acct.list} price list.`);
+  rule('R-120','Margin at or above 22% floor', margin<FLOOR?'review':'pass', margin<FLOOR?`Margin ${pct(margin)} after ${Math.round(disc*100)}% discount. Needs sales manager approval.`:`Margin ${pct(margin)} on ${acct.list}.`);
   const blocks=rules.filter(r=>r.status==='block'), reviews=rules.filter(r=>r.status==='review');
   const status=blocks.length?'bad':reviews.length?'warn':'ok';
-
-  // spec
   const steelLb=pieces.reduce((s,p)=>s+p.len/12*p.qty*(P[p.mat].lbft||0),0);
   const weight=steelLb+(c.mesh==='ss'?meshArea*0.6:meshArea*0.1)+castings*1.4+6+(c.pet?3:0);
-  let sec=1+(z?1:0)+(c.mesh==='ss'?2:0)+(c.lock==='dc'?1:0)-(c.pet?1:0);
+  const sec=1+(z?1:0)+(c.mesh==='ss'?2:0)+(c.lock==='dc'?1:0)-(c.pet?1:0);
   const secLvl=sec>=4?3:sec>=2?2:1;
   const lead=7+(c.color==='custom'?5:0)+(c.mesh==='ss'?2:0)+(c.opening==='sidelite'?2:0)+(c.opening==='double'?1:0);
-  return {valid:true,W,H,sq,z,fW,fH,pH,lw,leaves,side,panels,pieces,nests,cuts,B,R,route,matCost,labCost,cost,lines,subtotal,discount,net,tax,total,margin,t,acct,disc,rules,blocks,reviews,status,weight,secLvl,lead,ship:addBiz(lead),hinges};
+  return {valid:true,W,H,sq,z,fW,fH,pH,lw,leaves,side,panels,pieces,nests,cuts,B,R,route,matCost,labCost,cost,lines,subtotal,discount,net,tax,total,margin,t,acct,disc,rules,blocks,reviews,status,weight,secLvl,lead,ship:addBiz(lead),hinges,meshArea};
 }
 
-/* ---------- drawing ---------- */
-function drawDoor(r,c,opts){
-  const W=r.W,H=r.H, pad=10, top=8, bot=6;
-  const vx=-pad, vy=-top, vw=W+pad*2, vh=H+top+bot;
-  const fin=FIN[c.color].hex, hi=shade(fin,c.color==='white'?-.04:.32), lo=shade(fin,c.color==='white'?-.22:-.35), mid=shade(fin,c.color==='white'?-.1:.1);
-  const hw=c.color==='white'||c.color==='sand'?'#3b3936':shade(fin,-.15);
-  const meshTint={ss:.38,sol:.62,ins:.18,none:0}[c.mesh];
-  const S=[];
-  const R=(x,y,w,h,f,ex='')=>S.push(`<rect x="${x.toFixed(3)}" y="${y.toFixed(3)}" width="${Math.max(0,w).toFixed(3)}" height="${Math.max(0,h).toFixed(3)}" fill="${f}" ${ex}/>`);
-  // wall + opening
-  R(vx,vy,vw,vh,'url(#stucco)');
-  R(-0.6,-0.6,W+1.2,H+0.6,'#d9cdb9');
-  R(0,0,W,H,'url(#recess)');
-  if(opts.entry){
-    R(1.4,1.2,W-2.8,H-1.2,'url(#wood)');
-    const ex=1.4, ew=W-2.8, eh=H-1.2;
-    if(c.opening!=='double'){
-      for(let i=0;i<3;i++){const py=1.2+eh*0.08+i*eh*0.3; R(ex+ew*0.14,py,ew*0.72,eh*0.24,'none','stroke="#3a2416" stroke-opacity=".55" stroke-width=".35"')}
-      S.push(`<circle cx="${(c.hand==='LH'?ex+ew-3.2:ex+3.2).toFixed(2)}" cy="${(H-36).toFixed(2)}" r="1.1" fill="#c9a24d"/>`);
-    } else {
-      S.push(`<line x1="${W/2}" y1="1.2" x2="${W/2}" y2="${H}" stroke="#2a190f" stroke-width=".4"/>`);
-    }
-  }
-  // threshold & step
-  R(vx,H,vw,bot,'url(#step)');
-  R(-1.5,H-0.3,W+3,0.6,'#9a948a');
-  // frame
+/* shop drawing */
+function drawDoor(r,c,v){
+  const W=r.W,H=r.H;
   const fx=r.z?-1:0.125, fy=r.z?-1:0.0625;
-  const G=[];
-  const VR=(x,y,w,h)=>G.push(`<rect x="${x.toFixed(3)}" y="${y.toFixed(3)}" width="${Math.max(0,w).toFixed(3)}" height="${Math.max(0,h).toFixed(3)}" fill="url(#gV)"/>`);
-  const HR=(x,y,w,h)=>G.push(`<rect x="${x.toFixed(3)}" y="${y.toFixed(3)}" width="${Math.max(0,w).toFixed(3)}" height="${Math.max(0,h).toFixed(3)}" fill="url(#gH)"/>`);
-  VR(fx,fy,1,r.fH); VR(fx+r.fW-1,fy,1,r.fH); HR(fx,fy,r.fW,1);
-  const y0=fy+1+0.125;
-  const pos=[];
-  if(c.opening==='single') pos.push({p:r.panels[0],x:fx+1.1875,hinge:c.hand==='LH'?'L':'R',active:true});
+  const L=v.call?-22:-6, T=v.dim?-14:-5, Rr=r.fW+fx+(v.call?29:v.dim?12:5), Bb=H+(v.dim?18:5);
+  const vw=Rr-L, vh=Bb-T;
+  const fin=FIN[c.color].hex, edge=c.color==='white'||c.color==='sand'?'#5f5b50':shade(fin,-.35);
+  const meshCol={ss:'#8E8F86',sol:'#3d3d38',ins:'#7a7a72',none:null}[c.mesh];
+  const S=[], A=[];
+  const rect=(x,y,w,h,ex)=>S.push(`<rect x="${x.toFixed(3)}" y="${y.toFixed(3)}" width="${Math.max(0,w).toFixed(3)}" height="${Math.max(0,h).toFixed(3)}" ${ex}/>`);
+  const steel=(x,y,w,h)=>rect(x,y,w,h,`fill="${fin}" stroke="${edge}" stroke-width=".18"`);
+  // opening
+  rect(0,0,W,H,'fill="#FBFAF6" stroke="#9B9C8C" stroke-width=".25" stroke-dasharray="1.2 .8"');
+  S.push(`<line x1="${L+1}" y1="${H}" x2="${Rr-1}" y2="${H}" stroke="#6A6C5E" stroke-width=".35"/>`);
+  for(let x=L+1;x<Rr-1;x+=2.2) S.push(`<line x1="${x}" y1="${H}" x2="${x-1.4}" y2="${H+1.4}" stroke="#9B9C8C" stroke-width=".15"/>`);
+  // frame
+  steel(fx,fy,1,r.fH); steel(fx+r.fW-1,fy,1,r.fH); steel(fx,fy,r.fW,1);
+  const y0=fy+1.125, pos=[];
+  if(c.opening==='single'||!r.panels[1]) pos.push({p:r.panels[0],x:fx+1.1875,hinge:c.hand==='LH'?'L':'R',active:true});
   else if(c.opening==='double'){
     pos.push({p:r.panels[0],x:fx+1.125,hinge:'L',active:c.hand==='LH'});
     pos.push({p:r.panels[1],x:fx+1.125+r.leaves[0]+0.25,hinge:'R',active:c.hand==='RH'});
-  } else if(r.panels[1]){
+  } else {
     const sp=r.panels[1], lp=r.panels[0];
-    if(c.hand==='LH'){pos.push({p:sp,x:fx+1.125,side:true}); VR(fx+1+r.side,fy+1,1,r.fH-1); pos.push({p:lp,x:fx+1+r.side+1.1875,hinge:'L',active:true})}
-    else {pos.push({p:lp,x:fx+1.1875,hinge:'R',active:true}); const mx=fx+1.1875+lp.w+0.1875; VR(mx,fy+1,1,r.fH-1); pos.push({p:sp,x:mx+1.125,side:true})}
-  } else pos.push({p:r.panels[0],x:fx+1.1875,hinge:c.hand==='LH'?'L':'R',active:true});
+    if(c.hand==='LH'){pos.push({p:sp,x:fx+1.125,side:true}); steel(fx+1+r.side,fy+1,1,r.fH-1); pos.push({p:lp,x:fx+1+r.side+1.1875,hinge:'L',active:true})}
+    else {pos.push({p:lp,x:fx+1.1875,hinge:'R',active:true}); const mx=fx+1.1875+lp.w+0.1875; steel(mx,fy+1,1,r.fH-1); pos.push({p:sp,x:mx+1.125,side:true})}
+  }
+  let callLock=null, callHinge=null, callMesh=null;
   pos.forEach(o=>{
     const {p,x}=o, w=p.w, h=p.h, y=y0;
     if(w<=4||h<=6) return;
     const ix=x+2, iy=y+2, iw=w-4, ih=h-4, lockY=y+h-37;
-    if(c.mesh!=='none'){G.push(`<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" fill="#141414" fill-opacity="${meshTint}"/><rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" fill="url(#mesh)"/>`)}
-    if(c.style==='modern'){
-      for(let i=0;i<p.slats;i++){const yy=iy+ih*(i+1)/(p.slats+1)-0.5; HR(ix,yy,iw,1)}
-    } else if(c.style==='classic'){
+    if(meshCol){rect(ix,iy,iw,ih,`fill="url(#mesh)"`); if(!callMesh) callMesh={x:ix+iw*0.72,y:iy+ih*0.22}}
+    if(c.style==='modern'){ for(let i=0;i<p.slats;i++){const yy=iy+ih*(i+1)/(p.slats+1)-0.5; steel(ix,yy,iw,1)} }
+    else if(c.style==='classic'){ const n=p.pickets,g=(iw-0.5*n)/(n+1); for(let i=0;i<n;i++) steel(ix+g*(i+1)+0.5*i,iy,0.5,ih) }
+    else {
       const n=p.pickets,g=(iw-0.5*n)/(n+1);
-      for(let i=0;i<n;i++) VR(ix+g*(i+1)+0.5*i,iy,0.5,ih);
-    } else {
-      const n=p.pickets,g=(iw-0.5*n)/(n+1);
-      for(let i=0;i<n;i++) VR(ix+g*(i+1)+0.5*i,lockY+2,0.5,y+h-2-(lockY+2));
-      const upTop=iy, upBot=lockY, cy=(upTop+upBot)/2, sz=Math.min((upBot-upTop)*0.22,5.5);
-      const pairs=p.pairs;
-      for(let k=0;k<pairs;k++){
-        const cx=ix+iw*(k+0.5)/pairs;
-        const d=`M${cx} ${cy-sz*2} A${sz/2} ${sz/2} 0 1 0 ${cx} ${cy-sz} A${sz/2} ${sz/2} 0 1 1 ${cx} ${cy} M${cx} ${cy-sz*2} A${sz/2} ${sz/2} 0 1 1 ${cx} ${cy-sz} A${sz/2} ${sz/2} 0 1 0 ${cx} ${cy} M${cx} ${cy} A${sz/2} ${sz/2} 0 1 0 ${cx} ${cy+sz} A${sz/2} ${sz/2} 0 1 1 ${cx} ${cy+sz*2} M${cx} ${cy} A${sz/2} ${sz/2} 0 1 1 ${cx} ${cy+sz} A${sz/2} ${sz/2} 0 1 0 ${cx} ${cy+sz*2}`;
-        G.push(`<path d="${d}" fill="none" stroke="${mid}" stroke-width=".55" stroke-linecap="round"/>`);
-        G.push(`<path d="M${cx} ${upTop} V${cy-sz*2} M${cx} ${cy+sz*2} V${upBot}" stroke="${mid}" stroke-width=".5"/>`);
+      for(let i=0;i<n;i++) steel(ix+g*(i+1)+0.5*i,lockY+2,0.5,y+h-2-(lockY+2));
+      const cy=(iy+lockY)/2, sz=Math.min((lockY-iy)*0.2,5.2);
+      for(let k=0;k<p.pairs;k++){
+        const cx=ix+iw*(k+0.5)/p.pairs, a=sz/2;
+        S.push(`<path d="M${cx} ${cy-sz*2}A${a} ${a} 0 1 0 ${cx} ${cy-sz}A${a} ${a} 0 1 1 ${cx} ${cy}M${cx} ${cy-sz*2}A${a} ${a} 0 1 1 ${cx} ${cy-sz}A${a} ${a} 0 1 0 ${cx} ${cy}M${cx} ${cy}A${a} ${a} 0 1 0 ${cx} ${cy+sz}A${a} ${a} 0 1 1 ${cx} ${cy+sz*2}M${cx} ${cy}A${a} ${a} 0 1 1 ${cx} ${cy+sz}A${a} ${a} 0 1 0 ${cx} ${cy+sz*2}M${cx} ${iy}V${cy-sz*2}M${cx} ${cy+sz*2}V${lockY}" fill="none" stroke="${fin}" stroke-width=".55" stroke-linecap="round"/>`);
       }
     }
-    VR(x,y,2,h); VR(x+w-2,y,2,h);
-    HR(x,y,w,2); HR(x,y+h-2,w,2); HR(x,lockY,w,2);
-    if(p.rails===4) HR(x,y+(lockY-y)/2,w,2);
-    if(!o.side && c.kick) G.push(`<rect x="${x+2}" y="${y+h-12}" width="${w-4}" height="10" fill="url(#gH)"/><rect x="${x+2}" y="${y+h-12}" width="${w-4}" height="10" fill="#000" fill-opacity=".12"/>`);
-    if(!o.side && c.pet && o.active){const pw=9,ph=11,px=x+w/2-pw/2,py=y+h-2-(c.kick?10:0)-ph; G.push(`<rect x="${px}" y="${py}" width="${pw}" height="${ph}" rx=".8" fill="${shade(fin,-.3)}" stroke="${hi}" stroke-width=".35"/><rect x="${px+0.8}" y="${py+0.8}" width="${pw-1.6}" height="${ph-1.6}" rx=".5" fill="#2a2a2a" fill-opacity=".55"/>`)}
-    if(!o.side){
-      const n=h>84?4:3, hx=o.hinge==='L'?x-0.7:x+w-0.3;
-      for(let i=0;i<n;i++){const hy=y+6+(h-16)*i/(n-1); G.push(`<rect x="${hx}" y="${hy}" width="1" height="4" rx=".4" fill="${lo}"/>`)}
-      if(o.active){
-        const lx=o.hinge==='L'?x+w-3.3:x+1.3;
-        G.push(`<rect x="${lx}" y="${lockY-9.5}" width="2" height="12" rx=".5" fill="${hw}"/>`);
-        G.push(`<circle cx="${lx+1}" cy="${lockY-7.5}" r=".75" fill="#c9a24d"/>`);
-        const lev=o.hinge==='L'?-4.2:4.2;
-        G.push(`<path d="M${lx+1} ${lockY-1.4} h${lev}" stroke="${hw}" stroke-width="1.1" stroke-linecap="round"/><circle cx="${lx+1}" cy="${lockY-1.4}" r="1" fill="${hw}"/>`);
-      }
-      if(opts.swing){
-        const lx=o.hinge==='L'?x+w:x, hgx=o.hinge==='L'?x:x+w;
-        G.push(`<path d="M${lx} ${y} L${hgx} ${y+h/2} L${lx} ${y+h}" fill="none" stroke="#1a56db" stroke-width=".3" stroke-dasharray="1.6 1.1" ${c.swing==='in'?'stroke-opacity=".55"':''}/>`);
-      }
+    steel(x,y,2,h); steel(x+w-2,y,2,h); steel(x,y,w,2); steel(x,y+h-2,w,2); steel(x,lockY,w,2);
+    if(p.rails===4) steel(x,y+(lockY-y)/2,w,2);
+    if(!o.side&&c.kick) rect(x+2,y+h-12,w-4,10,`fill="${fin}" fill-opacity=".85" stroke="${edge}" stroke-width=".18"`);
+    if(!o.side&&c.pet&&o.active){const pw=9,ph=11,px=x+w/2-pw/2,py=y+h-2-(c.kick?10:0)-ph; rect(px,py,pw,ph,`rx=".6" fill="#F0EEE6" stroke="${edge}" stroke-width=".3"`)}
+    if(o.side){S.push(`<text x="${x+w/2}" y="${y+h/2}" text-anchor="middle" class="tx">FIXED</text>`); return}
+    const n=h>84?4:3, hx=o.hinge==='L'?x-0.7:x+w-0.3;
+    for(let i=0;i<n;i++){const hy=y+6+(h-16)*i/(n-1); rect(hx,hy,1,4,`rx=".3" fill="#A57C2C"`); if(i===0&&!callHinge) callHinge={x:hx+0.5,y:hy+2,n,left:o.hinge==='L'}}
+    if(o.active){
+      const lx=o.hinge==='L'?x+w-3.3:x+1.3;
+      rect(lx,lockY-9.5,2,12,`rx=".4" fill="#1E211A"`);
+      S.push(`<circle cx="${lx+1}" cy="${lockY-7.5}" r=".7" fill="#A57C2C"/>`);
+      const lev=o.hinge==='L'?-4.2:4.2;
+      S.push(`<path d="M${lx+1} ${lockY-1.4}h${lev}" stroke="#1E211A" stroke-width="1.1" stroke-linecap="round"/>`);
+      callLock={x:lx+1,y:lockY-7.5,right:o.hinge==='L'};
+    }
+    if(v.swing){
+      const lx=o.hinge==='L'?x+w:x, hgx=o.hinge==='L'?x:x+w;
+      S.push(`<path d="M${lx} ${y}L${hgx} ${y+h/2}L${lx} ${y+h}" fill="none" stroke="#4E5B31" stroke-width=".25" stroke-dasharray="1.5 1"/>`);
     }
   });
-  const svg=`<svg viewBox="${vx} ${vy} ${vw} ${vh}" role="img" aria-label="${esc(`Rendering of the configured ${c.opening} security door, ${frac(r.fW)} by ${frac(r.fH)}, ${FIN[c.color].n}`)}">
+  // dimensions
+  const dim=(x1,y1,x2,y2,label,off,vert)=>{
+    if(!vert){
+      const y=y1+off;
+      A.push(`<line x1="${x1}" y1="${y1}" x2="${x1}" y2="${y+(off>0?1:-1)}" class="ext"/><line x1="${x2}" y1="${y1}" x2="${x2}" y2="${y+(off>0?1:-1)}" class="ext"/>`);
+      A.push(`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" class="dl" marker-start="url(#ar)" marker-end="url(#ar)"/>`);
+      A.push(`<rect x="${(x1+x2)/2-label.length*0.95}" y="${y-1.9}" width="${label.length*1.9}" height="3.6" fill="#fff"/><text x="${(x1+x2)/2}" y="${y+1.05}" text-anchor="middle" class="dt">${esc(label)}</text>`);
+    } else {
+      const x=x1+off;
+      A.push(`<line x1="${x1}" y1="${y1}" x2="${x+1}" y2="${y1}" class="ext"/><line x1="${x1}" y1="${y2}" x2="${x+1}" y2="${y2}" class="ext"/>`);
+      A.push(`<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" class="dl" marker-start="url(#ar)" marker-end="url(#ar)"/>`);
+      A.push(`<g transform="translate(${x} ${(y1+y2)/2}) rotate(-90)"><rect x="${-label.length*0.95}" y="-1.9" width="${label.length*1.9}" height="3.6" fill="#fff"/><text x="0" y="1.05" text-anchor="middle" class="dt">${esc(label)}</text></g>`);
+    }
+  };
+  if(v.dim){
+    dim(fx,fy+r.fH,fx+r.fW,0,`${frac(r.fW)} UNIT`,7,false);
+    dim(0,H,W,0,`${frac(W)} R.O.`,13,false);
+    dim(fx+r.fW,fy,0,fy+r.fH,`${frac(r.fH)}`,6,true);
+    const a=pos.find(o=>o.active)||pos[0];
+    if(a) dim(a.x,y0,a.x+a.p.w,0,`LEAF ${frac(a.p.w)}`,-(y0-T)+4,false);
+  }
+  if(v.call){
+    const ball=(n,px,py,tx,ty,text,right)=>{
+      A.push(`<line x1="${px}" y1="${py}" x2="${tx}" y2="${ty}" stroke="#A57C2C" stroke-width=".22"/><circle cx="${px}" cy="${py}" r=".45" fill="#A57C2C"/>`);
+      A.push(`<circle cx="${tx}" cy="${ty}" r="2" fill="#fff" stroke="#A57C2C" stroke-width=".3"/><text x="${tx}" y="${ty+0.95}" text-anchor="middle" class="bn">${n}</text>`);
+      A.push(`<text x="${right?tx+3:tx-3}" y="${ty+0.9}" text-anchor="${right?'start':'end'}" class="ct">${esc(text)}</text>`);
+    };
+    const rx=fx+r.fW+(v.dim?10:4), lxx=-4;
+    if(callLock) ball(1,callLock.x,callLock.y,callLock.right?rx:lxx,callLock.y-6,c.lock==='dc'?'LCK-DC-SET':'LCK-SC-SET',callLock.right);
+    if(callHinge) ball(2,callHinge.x,callHinge.y,callHinge.left?lxx:rx,callHinge.y+4,`HNG ×${callHinge.n}`,!callHinge.left);
+    if(callMesh) ball(3,callMesh.x,callMesh.y,rx,callMesh.y+10,{ss:'MESH-SS12',sol:'MESH-SOL80',ins:'MESH-FG18'}[c.mesh],true);
+  }
+  return `<svg viewBox="${L} ${T} ${vw} ${vh}" role="img" aria-label="${esc(`Shop drawing of the ${c.opening} security door, unit ${frac(r.fW)} by ${frac(r.fH)}`)}">
   <defs>
-    <linearGradient id="gV" x1="0" x2="1"><stop offset="0" stop-color="${lo}"/><stop offset=".45" stop-color="${hi}"/><stop offset="1" stop-color="${lo}"/></linearGradient>
-    <linearGradient id="gH" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${hi}"/><stop offset=".55" stop-color="${mid}"/><stop offset="1" stop-color="${lo}"/></linearGradient>
-    <linearGradient id="recess" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2b2622"/><stop offset="1" stop-color="#3d3631"/></linearGradient>
-    <linearGradient id="wood" x1="0" x2="1"><stop offset="0" stop-color="#5a3a24"/><stop offset=".5" stop-color="#6e4a2f"/><stop offset="1" stop-color="#4d311e"/></linearGradient>
-    <linearGradient id="step" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#cfc7bb"/><stop offset="1" stop-color="#b8afa2"/></linearGradient>
-    <linearGradient id="stucco" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ece2d2"/><stop offset="1" stop-color="#e2d5c1"/></linearGradient>
-    <pattern id="mesh" width=".5" height=".5" patternUnits="userSpaceOnUse"><path d="M0 0H.5M0 0V.5" stroke="${c.mesh==='ss'?'#9a9a96':'#555'}" stroke-width=".06" stroke-opacity=".7"/></pattern>
-    <filter id="sh" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx=".4" dy=".8" stdDeviation=".7" flood-color="#000" flood-opacity=".35"/></filter>
+   <pattern id="grid" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M6 0H0V6" fill="none" stroke="#EFECE2" stroke-width=".12"/></pattern>
+   ${meshCol?`<pattern id="mesh" width=".9" height=".9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H.9M0 0V.9" stroke="${meshCol}" stroke-width=".07" stroke-opacity="${c.mesh==='sol'?'.55':'.5'}"/></pattern>`:''}
+   <marker id="ar" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 1.2L6 3L0 4.8z" fill="#A57C2C"/></marker>
+   <style>.ext{stroke:#B9B49F;stroke-width:.15}.dl{stroke:#A57C2C;stroke-width:.22}.dt{font:500 2.3px 'IBM Plex Mono',monospace;fill:#7A5B1E}.tx{font:500 2.4px 'IBM Plex Mono',monospace;fill:#9B9C8C}.bn{font:600 2.4px 'IBM Plex Sans',sans-serif;fill:#7A5B1E}.ct{font:500 2.2px 'IBM Plex Mono',monospace;fill:#6A6C5E}</style>
   </defs>
-  ${S.join('')}<g filter="url(#sh)">${G.join('')}</g></svg>`;
-  return svg;
+  <rect x="${L}" y="${T}" width="${vw}" height="${vh}" fill="url(#grid)"/>
+  ${S.join('')}${A.join('')}</svg>`;
 }
 
-/* ---------- UI binding ---------- */
+/* UI binding */
 const GROUPS_UI={opening:'g-opening',mount:'g-mount',swing:'g-swing',hand:'g-hand',style:'g-style',mesh:'g-mesh',lock:'g-lock',closer:'g-closer',color:'g-color'};
-$('g-color').innerHTML=Object.entries(FIN).map(([k,f])=>`<button type="button" class="sw" data-v="${k}" title="${f.n} · ${f.code}"><i style="background:${f.hex}"></i>${f.n.replace(' ','<br>')}</button>`).join('');
+$('g-color').innerHTML=Object.entries(FIN).map(([k,f])=>`<button type="button" class="sw" data-v="${k}" title="${f.n}, ${f.code}"><i style="background:${f.hex}"></i>${f.n}</button>`).join('');
 Object.entries(GROUPS_UI).forEach(([key,id])=>{
-  $(id).addEventListener('click',e=>{const b=e.target.closest('button[data-v]'); if(!b) return; cfg[key]=b.dataset.v; render()});
+  $(id).addEventListener('click',e=>{const b=e.target.closest('button[data-v]'); if(!b) return; if(cfg[key]!==b.dataset.v){cfg[key]=b.dataset.v; touch()} render()});
 });
-['sideW','wTop','wMid','wBot','hL','hR','disc'].forEach(id=>$(id).addEventListener('input',()=>{cfg[id]=$(id).value; render()}));
-['kick','pet','install'].forEach(id=>$(id).addEventListener('change',()=>{cfg[id]=$(id).checked; render()}));
-$('acct').addEventListener('change',()=>{cfg.acct=$('acct').value; render()});
+['sideW','wTop','wMid','wBot','hL','hR','disc'].forEach(id=>$(id).addEventListener('input',()=>{cfg[id]=$(id).value; touch(); render()}));
+['kick','pet','install'].forEach(id=>$(id).addEventListener('change',()=>{cfg[id]=$(id).checked; touch(); render()}));
+$('acct').addEventListener('change',()=>{cfg.acct=$('acct').value; touch(); render()});
 $('job').addEventListener('change',()=>load(+$('job').value));
-$('vSwing').addEventListener('click',()=>{S.view.swing=!S.view.swing; render()});
-$('vEntry').addEventListener('click',()=>{S.view.entry=!S.view.entry; render()});
+[['tDim','dim'],['tSwing','swing'],['tCall','call']].forEach(([id,k])=>$(id).addEventListener('click',()=>{S.view[k]=!S.view[k]; render()}));
+document.querySelectorAll('[data-mod]').forEach(b=>b.addEventListener('click',()=>toast(`${b.dataset.mod} is part of the full DoorIQ build. This demo opens on Quotes.`)));
+function touch(){S.saved=new Date(); S.sent[S.job]=false}
 
 function load(i){
   S.job=i; cfg={...PRESETS[i]};
   ['sideW','wTop','wMid','wBot','hL','hR','disc'].forEach(id=>$(id).value=cfg[id]);
   ['kick','pet','install'].forEach(id=>$(id).checked=cfg[id]);
   $('acct').value=cfg.acct; $('job').value=String(i);
+  S.saved=new Date();
   render();
 }
 
 let last=null;
 function render(){
+  const t0=performance.now();
   const c=cfg;
-  Object.entries(GROUPS_UI).forEach(([key,id])=>{
-    $(id).querySelectorAll('button[data-v]').forEach(b=>{
-      const on=b.dataset.v===c[key];
-      if($(id).classList.contains('segs')) b.classList.toggle('sel',on); else b.classList.toggle('on',on);
-      b.setAttribute('aria-pressed',on);
-    });
-  });
+  Object.entries(GROUPS_UI).forEach(([key,id])=>$(id).querySelectorAll('button[data-v]').forEach(b=>{const on=b.dataset.v===c[key]; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on)}));
   $('sideWrap').hidden=c.opening!=='sidelite';
   ['wTop','wMid','wBot','hL','hR'].forEach(id=>$(id).classList.toggle('bad',!(parseIn($(id).value)>0)));
   $('sideW').classList.toggle('bad',c.opening==='sidelite'&&!(parseIn($('sideW').value)>0));
-  $('vSwing').classList.toggle('sel',S.view.swing); $('vEntry').classList.toggle('sel',S.view.entry);
+  [['tDim','dim'],['tSwing','swing'],['tCall','call']].forEach(([id,k])=>{$(id).classList.toggle('on',S.view[k]); $(id).setAttribute('aria-pressed',S.view[k])});
+  const job=JOBS[S.job];
+  $('crumbNo').textContent=job.no; $('recTitle').textContent=job.title;
 
-  const r=compute(c);
-  last=r;
-  const note=$('measNote');
+  const r=compute(c); last=r;
   if(!r.valid){
-    note.className='note bad'; note.textContent='Enter all five measurements to price this door.';
-    $('calc').className='calc bad'; $('calcTxt').textContent='Waiting for measurements';
-    return;
+    $('measNote').className='msg err'; $('measNote').textContent='Enter all five measurements to price this door.';
+    $('sbCalc').textContent='Waiting for measurements'; return;
   }
-  note.className='note'+(r.sq>0.75?' bad':r.sq>0.375?' warn':'');
-  note.textContent=r.sq<=0.375?`Square within ${frac(r.sq)} · building to ${frac(r.W)} × ${frac(r.H)}`:`Out of square ${frac(r.sq)} · building to ${frac(r.W)} × ${frac(r.H)}`;
-
   const STY={classic:'Classic picket',modern:'Modern horizontal',scroll:'Desert scroll'};
-  $('summary').textContent=`${{single:'Single',double:'Double',sidelite:'Door + sidelite'}[c.opening]} · ${frac(r.fW).replace(/"/,'')}×${frac(r.fH)} · ${STY[c.style]} · ${FIN[c.color].n} · ${{ss:'SS mesh',sol:'Solar 80%',ins:'Insect',none:'No screen'}[c.mesh]}`;
-  $('qtv').textContent=usd(r.total);
-  $('qtv').style.color=r.status==='bad'?'var(--muted)':'var(--green)';
-  const nb=r.blocks.length, nr=r.reviews.length;
-  $('calc').className='calc'+(r.status==='bad'?' bad':r.status==='warn'?' warn':'');
-  $('calcTxt').textContent=`Recalculated · ${r.rules.length} rules · ${r.B.length} BOM lines · ${r.cuts} cuts`;
+  $('measNote').className='msg'+(r.sq>0.75?' err':r.sq>0.375?' warn':'');
+  $('measNote').textContent=r.sq<=0.375?`Square within ${frac(r.sq)}. Building to ${frac(r.W)} × ${frac(r.H)}.`:`Out of square by ${frac(r.sq)}. Building to ${frac(r.W)} × ${frac(r.H)}.`;
+  $('v-open').textContent={single:'Single',double:'Double',sidelite:'With sidelite'}[c.opening];
+  $('v-meas').textContent=`${frac(r.W)} × ${frac(r.H)}`;
+  $('v-frame').textContent=`${r.z?'Z-bar':'Flush'}, ${c.swing} ${c.hand}`;
+  $('v-style').textContent=STY[c.style];
+  $('v-mesh').textContent={ss:'Stainless 12×12',sol:'Solar 80%',ins:'Insect',none:'None'}[c.mesh];
+  $('v-fin').textContent=FIN[c.color].n;
+  $('v-hw').textContent=`${c.lock==='dc'?'Double':'Single'}-cyl, ${{none:'no closer',pn:'pneumatic',hy:'hydraulic'}[c.closer]}`;
+  $('v-optn').textContent=[c.kick&&'Kickplate',c.pet&&'Pet door',c.install&&'Install'].filter(Boolean).join(', ')||'None';
+  $('v-price').textContent=`${r.acct.list.split(' ')[0]}, ${Math.round(r.disc*100)}%`;
 
+  // record header
+  const sent=S.sent[S.job];
+  const badge=$('recBadge');
+  if(r.blocks.length){badge.className='badge b-err'; badge.textContent=`Blocked, ${r.blocks.length} issue${r.blocks.length>1?'s':''}`}
+  else if(sent){badge.className='badge b-sent'; badge.textContent='Sent to customer'}
+  else if(r.reviews.length){badge.className='badge b-warn'; badge.textContent='In review'}
+  else {badge.className='badge b-ok'; badge.textContent='Approved'}
+  $('mAcct').textContent=r.acct.name; $('mList').textContent=`${r.acct.list}, eff. Oct 1, 2026`;
+  $('mRev').textContent=`Rev ${job.rev}`; $('mTotal').textContent=usd(r.total); $('mSaved').textContent=`Today ${hhmm(S.saved)}`;
+  const steps=['Draft','Engineering check','Approval','Sent','Ordered'];
+  const curI=r.blocks.length?1:r.reviews.length?2:sent?4:3;
+  const tone=r.blocks.length?' err':r.reviews.length?' warn':'';
+  $('stepper').innerHTML=steps.map((s,i)=>{
+    const cls=i<curI?'done':i===curI?'cur'+tone:'';
+    return `<div class="step ${cls}"><i>${i<curI?'✓':i+1}</i>${s}</div>`;
+  }).join('');
+  const rel=$('relBtn');
+  if(r.blocks.length){rel.disabled=true; rel.textContent='Release quote'}
+  else if(r.reviews.length){rel.disabled=S.requested[S.job]; rel.textContent=S.requested[S.job]?'Approval requested':'Request approval'}
+  else {rel.disabled=sent; rel.textContent=sent?'Released':'Release quote'}
+
+  // drawing + specs
   $('art').innerHTML=drawDoor(r,c,S.view);
-  $('dimpill').textContent=`${frac(r.fW)} × ${frac(r.fH)} unit · ${ftin(r.fW)} × ${ftin(r.fH)}`;
+  $('tblock').innerHTML=[['Customer',r.acct.name],['Quote',job.no],['Revision',job.rev],['Finish',FIN[c.color].code],['Scale','NTS']].map(([k,v])=>`<div><span>${k}</span><b>${esc(v)}</b></div>`).join('');
+  $('specSub').textContent=`${r.panels.length} panel${r.panels.length>1?'s':''}, ${r.cuts} cuts`;
+  const lvl=['','Basic','Medium','High'][r.secLvl];
+  $('kv').innerHTML=[
+    ['Unit size',`${frac(r.fW)} × ${frac(r.fH)}`],['Rough opening',`${frac(r.W)} × ${frac(r.H)}`],
+    ['Leaf size',`${frac(r.lw)} × ${frac(r.pH)}`],['Hinges',`${r.hinges} weld-on, heavy duty`],
+    ['Security rating',`${lvl}<span class="lvl">${[1,2,3].map(i=>`<i class="${i<=r.secLvl?'f':''}"></i>`).join('')}</span>`],['Egress',c.lock==='dc'?'Key to exit, review':'Free exit'],
+    ['Weight',`${Math.round(r.weight)} lb`],['Finish',`${FIN[c.color].n}, ${FIN[c.color].code}`],
+    ['Lead time',`${r.lead} business days`],['Ships',fmtDL(r.ship)]
+  ].map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
 
-  // spec card
-  const secTxt=['','Basic','Medium','High'][r.secLvl];
-  $('kSec').innerHTML=`${secTxt}<span class="bars">${[1,2,3].map(i=>`<i class="${i<=r.secLvl?'f':''}"></i>`).join('')}</span>`;
-  $('kWt').textContent=Math.round(r.weight);
-  $('kLead').textContent=r.lead;
-  $('kShip').textContent=fmtD(r.ship);
-  $('perfTag').textContent=`${QNO[S.job]} · Rev ${String.fromCharCode(65+Math.min(25,0))}`;
-  const bd=[];
-  bd.push(c.lock==='dc'?'<span class="bdg a">Key-to-exit · check egress</span>':'<span class="bdg g">✓ Free egress</span>');
-  if(c.mesh==='ss') bd.push('<span class="bdg">Stainless 12×12</span>');
-  if(r.z) bd.push('<span class="bdg">Gap-covering Z-bar</span>');
-  bd.push('<span class="bdg">Tamper-proof fasteners</span>');
-  bd.push(`<span class="bdg">${r.hinges} hinges</span>`);
-  if(c.color==='custom') bd.push(`<span class="bdg">${FIN.custom.code}</span>`);
-  $('badges').innerHTML=bd.join('');
-  $('leaves').innerHTML=r.panels.map(p=>`<div class="leaf"><b>${p.name}</b><span class="mono">${frac(p.w)} × ${frac(p.h)}</span></div>`).join('')+`<div class="leaf"><b>Frame</b><span class="mono">${frac(r.fW)} × ${frac(r.fH)}</span></div>`;
+  // alert + counts
+  const al=$('alert');
+  if(r.blocks.length){al.className='alert msg err'; al.textContent=`${r.blocks.length} engineering conflict${r.blocks.length>1?'s':''}. The quote can't be released until fixed.`}
+  else if(r.reviews.length){al.className='alert msg warn'; al.textContent=`${r.reviews.length} item${r.reviews.length>1?'s':''} need review before release.`}
+  else {al.className='alert msg'; al.textContent='All rules pass. Ready to release.'}
+  $('c-bom').textContent=r.B.length; $('c-cut').textContent=r.cuts;
+  const cr=$('c-rules'); cr.textContent=r.blocks.length||r.reviews.length||r.rules.length; cr.className='cnt'+(r.blocks.length?' err':r.reviews.length?' warn':'');
 
-  // status banner
-  const st=$('status');
-  if(nb){st.className='status note bad'; st.textContent=`${nb} engineering conflict${nb>1?'s':''} · quote can't be released. See Rules.`}
-  else if(nr){st.className='status note warn'; st.textContent=`${nr} item${nr>1?'s':''} need review before release. See Rules.`}
-  else {st.className='status note'; st.textContent='No engineering conflicts detected.'}
-
-  renderBOM(r); renderCut(r); renderRoute(r); renderRules(r); renderQuote(r,c);
+  renderBOM(r); renderCut(r); renderRoute(r); renderRules(r); renderPrice(r,c); renderLog(r,c);
+  const ms=Math.max(1,Math.round(performance.now()-t0));
+  $('sbCalc').textContent=`Recalculated in ${ms} ms`;
+  $('sbRules').textContent=`Rules engine: ${r.rules.length} rules, ${r.blocks.length} blocked, ${r.reviews.length} review`;
+  $('sbList').textContent=`Price list ${r.acct.list}`;
   if(!$('modal').hidden) renderDoc();
 }
 
 function renderBOM(r){
   const byG={}; r.B.forEach(l=>(byG[l.g]=byG[l.g]||[]).push(l));
-  let h=`<div class="meta"><span class="chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>Rules engine</span><span>${r.B.length} line items</span></div>`;
-  GROUPS.forEach(g=>{ const ls=byG[g]; if(!ls) return;
-    h+=`<div class="ghdr"><span>${g}</span><span>${usd(ls.reduce((s,l)=>s+l.ext,0))}</span></div>`;
-    h+=ls.map(l=>`<div class="ln"><span class="pn">${l.pn}</span><span class="d">${esc(l.d)}</span><span class="q">${esc(l.qtxt)}</span><span class="x">${usd(l.ext)}</span></div>`).join('');
+  let rows='';
+  GROUPS.forEach(g=>{const ls=byG[g]; if(!ls) return;
+    rows+=`<tr class="grp"><td colspan="3">${g}</td><td class="r">${usd(ls.reduce((s,l)=>s+l.ext,0))}</td></tr>`;
+    rows+=ls.map(l=>`<tr><td><span class="pn">${l.pn}</span><span class="s" style="color:var(--ink);font-size:12.5px">${esc(l.d)}</span></td><td class="r">${+l.qty.toFixed(2)} ${l.u}</td><td class="r">${usd(l.c)}</td><td class="r">${usd(l.ext)}</td></tr>`).join('');
   });
-  h+=`<div class="ghdr"><span>Labor · routing</span><span>${usd(r.labCost)}</span></div>`;
-  h+=Object.entries(r.route).map(([wc,o])=>`<div class="ln"><span class="pn">${wc}</span><span class="d">${WC[wc].n}</span><span class="q">${o.hrs.toFixed(2)} HR × ${usd(WC[wc].rate)}</span><span class="x">${usd(o.ext)}</span></div>`).join('');
-  h+=`<div class="tot"><span>Total shop cost</span><span>${usd(r.cost)}</span></div>`;
-  $('p-bom').innerHTML=h;
+  rows+=`<tr class="grp"><td colspan="3">Labor, from routing</td><td class="r">${usd(r.labCost)}</td></tr>`;
+  rows+=Object.entries(r.route).map(([wc,o])=>`<tr><td><span class="pn">${wc}</span><span class="s" style="color:var(--ink);font-size:12.5px">${WC[wc].n}</span></td><td class="r">${o.hrs.toFixed(2)} HR</td><td class="r">${usd(WC[wc].rate)}</td><td class="r">${usd(o.ext)}</td></tr>`).join('');
+  rows+=`<tr class="tot"><td colspan="3">Total shop cost</td><td class="r">${usd(r.cost)}</td></tr>`;
+  $('p-bom').innerHTML=`<div class="ptitle"><b>Bill of materials</b><span>Generated from configuration, ${r.B.length} lines</span></div>
+   <div class="dtw"><table class="dt"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Unit cost</th><th class="r">Extended</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function renderCut(r){
-  const NM={tube:'Panel tube 1"×2"',pick:'Picket 1/2" sq',hbar:'Slat tube 1"×1"',zbar:'Z-bar frame',flush:'Angle frame'};
-  let totUsed=0,totStock=0,h='';
+  const NM={tube:'Panel tube 1"×2"',pick:'Picket 1/2" square',hbar:'Slat tube 1"×1"',zbar:'Z-bar frame',flush:'Angle frame'};
+  let used=0,stock=0,h='';
   Object.keys(r.nests).forEach(m=>{
     const bins=r.nests[m]; if(!bins.length) return;
-    const used=bins.reduce((s,b)=>s+b.parts.reduce((t,p)=>t+p.len,0),0); totUsed+=used; totStock+=bins.length*STOCK;
-    const sticks=bins.map((b,i)=>`<div class="sticklab"><span>Stick ${i+1}</span><span>drop ${frac(STOCK-b.used)}</span></div><div class="stick" role="img" aria-label="Stick ${i+1}, ${b.parts.length} cuts">${b.parts.map((p,j)=>`<div class="cutseg${j%2?' b':''}" style="width:${(p.len/STOCK*100).toFixed(2)}%" title="${esc(p.label)} · ${esc(frac(p.len))}">${p.len/STOCK>.09?esc(frac(p.len)):''}</div>`).join('')}</div>`).join('');
-    const rows=r.pieces.filter(p=>p.mat===m).map(p=>`<tr><td>${esc(p.label)}</td><td>${p.qty}×</td><td>${frac(p.len)}</td></tr>`).join('');
-    h+=`<div class="mat"><div class="mat-h"><b>${NM[m]} <span class="util">${P[m].pn}</span></b><span class="util">${bins.length} × 24' · ${pct(used/(bins.length*STOCK))} yield</span></div><table class="ptab"><tbody>${rows}</tbody></table>${sticks}</div>`;
+    const u=bins.reduce((s,b)=>s+b.parts.reduce((t,p)=>t+p.len,0),0); used+=u; stock+=bins.length*STOCK;
+    const rows=r.pieces.filter(p=>p.mat===m).map(p=>`<tr><td>${esc(p.label)}</td><td class="r">${p.qty}</td><td class="r">${frac(p.len)}</td></tr>`).join('');
+    const sticks=bins.map((b,i)=>`<div class="stk"><div class="l"><span>Stick ${i+1}</span><span>Drop ${frac(STOCK-b.used)}</span></div><div class="stick" role="img" aria-label="Stick ${i+1}, ${b.parts.length} cuts">${b.parts.map((p,j)=>`<i class="${j%2?'b':''}" style="width:${(p.len/STOCK*100).toFixed(2)}%" title="${esc(p.label)} ${esc(frac(p.len))}">${p.len/STOCK>.1?esc(frac(p.len)):''}</i>`).join('')}</div></div>`).join('');
+    h+=`<div class="dtw"><table class="dt"><thead><tr><th>${NM[m]} <span class="pn">${P[m].pn}</span></th><th class="r">Qty</th><th class="r">Length</th></tr></thead><tbody>${rows}</tbody></table>
+      <div style="padding:8px;display:grid;gap:6px;border-top:1px solid var(--line-soft)"><div class="ptitle"><span>${bins.length} × 24' stock</span><span>${pct(u/(bins.length*STOCK))} yield</span></div>${sticks}</div></div>`;
   });
-  $('p-cut').innerHTML=`<div class="meta"><span class="chip">Nested on 24' stock · ${frac(KERF)} kerf</span><span>${r.cuts} cuts · ${pct(totUsed/totStock)} yield</span></div>`+h;
+  $('p-cut').innerHTML=`<div class="ptitle"><b>Cut list</b><span>${r.cuts} cuts, ${pct(used/stock)} yield, ${frac(KERF)} kerf</span></div>`+h;
 }
 function renderRoute(r){
-  const tot=Object.values(r.route).reduce((s,o)=>s+o.hrs,0);
-  const ops=Object.entries(r.route);
-  $('p-route').innerHTML=`<div class="meta"><span class="chip">${ops.length} operations</span><span>${tot.toFixed(2)} hrs · ${usd(r.labCost)}</span></div>`+
-    ops.map(([wc,o],i)=>`<div class="op"><span class="seq">${String((i+1)*10).padStart(3,'0')}</span><span><span class="wc">${wc}</span> · <span class="nm">${WC[wc].n}</span></span><span class="hr">${o.hrs.toFixed(2)} h</span><span class="bar"><i style="width:${(o.hrs/tot*100).toFixed(1)}%"></i></span></div>`).join('')+
-    `<div class="tot"><span>Ships ${fmtDL(r.ship)}</span><span>${r.lead} business days</span></div>`;
+  const ops=Object.entries(r.route), tot=ops.reduce((s,[,o])=>s+o.hrs,0);
+  $('p-route').innerHTML=`<div class="ptitle"><b>Routing</b><span>${ops.length} operations, ${tot.toFixed(2)} hours</span></div>
+   <div class="dtw"><table class="dt"><thead><tr><th>Op</th><th>Work center</th><th class="r">Hours</th><th class="r">Cost</th></tr></thead><tbody>
+   ${ops.map(([wc,o],i)=>`<tr><td class="pn">${String((i+1)*10).padStart(3,'0')}</td><td><span class="pn">${wc}</span><span class="s" style="color:var(--ink);font-size:12.5px">${WC[wc].n}</span><div class="wbar"><i style="width:${(o.hrs/tot*100).toFixed(1)}%"></i></div></td><td class="r">${o.hrs.toFixed(2)}</td><td class="r">${usd(o.ext)}</td></tr>`).join('')}
+   <tr class="tot"><td colspan="2">Total labor</td><td class="r">${tot.toFixed(2)}</td><td class="r">${usd(r.labCost)}</td></tr></tbody></table></div>
+   <div class="ptitle"><span>Earliest ship date</span><b>${fmtDL(r.ship)}</b></div>`;
 }
 function renderRules(r){
   const LAB={pass:'Pass',auto:'Applied',review:'Review',block:'Blocked',info:'Info'};
   const ord={block:0,review:1,auto:2,info:3,pass:4};
   const rs=[...r.rules].sort((a,b)=>ord[a.status]-ord[b.status]);
-  const n=k=>r.rules.filter(x=>x.status===k).length;
-  $('p-rules').innerHTML=`<div class="meta"><span class="chip">${r.rules.length} rules evaluated</span><span>${n('pass')} pass · ${n('auto')} applied · ${n('review')} review · ${n('block')} blocked</span></div>`+
-    rs.map(x=>`<div class="rule"><span class="rid">${x.id}</span><span class="rn">${esc(x.name)}</span><span class="res ${x.status}">${LAB[x.status]}</span><span class="rd">${esc(x.detail)}</span></div>`).join('');
+  $('p-rules').innerHTML=`<div class="ptitle"><b>Rules engine</b><span>${r.rules.length} rules evaluated on every change</span></div>
+   <div class="dtw"><table class="dt"><thead><tr><th>Rule</th><th>Check</th><th class="r">Result</th></tr></thead><tbody>
+   ${rs.map(x=>`<tr><td class="pn">${x.id}</td><td>${esc(x.name)}<span class="s">${esc(x.detail)}</span></td><td class="r"><span class="res ${x.status}">${LAB[x.status]}</span></td></tr>`).join('')}
+   </tbody></table></div>`;
 }
-function renderQuote(r,c){
-  const rows=r.lines.map(l=>`<div class="qrow"><span>${esc(l.t)}<small>${esc(l.s)}</small></span><span class="v">${usd(l.price)}</span></div>`).join('');
-  const gm=r.net-r.cost;
-  const mw=Math.max(0,Math.min(1,r.margin/0.6));
-  const appr=r.blocks.length?'Blocked':r.margin<FLOOR?'Needs manager approval':'Auto-approved';
-  $('p-quote').innerHTML=`
-   <div class="meta"><span class="chip">${esc(r.acct.name)} · ${r.acct.list} price list</span><span>${QNO[S.job]}</span></div>
-   <div class="qcard">${rows}</div>
-   <div class="qsum">
-     <div class="qrow"><span>Subtotal</span><span class="v">${usd(r.subtotal)}</span></div>
-     ${r.discount?`<div class="qrow"><span>Discount ${Math.round(r.disc*100)}%</span><span class="v">−${usd(r.discount)}</span></div>`:''}
-     <div class="qrow"><span>${r.acct.tax?'Est. AZ sales tax (8.6%, product)':'Sales tax · resale exempt'}</span><span class="v">${usd(r.tax)}</span></div>
-     <div class="qrow grand"><span>Total</span><span class="v">${usd(r.total)}</span></div>
+function renderPrice(r,c){
+  const mw=Math.max(0,Math.min(1,r.margin/0.6)), low=r.margin<FLOOR;
+  const appr=r.blocks.length?'Blocked by rules':low?(S.requested[S.job]?'Waiting on sales manager':'Needs sales manager approval'):'Within policy, no approval needed';
+  $('p-price').innerHTML=`<div class="ptitle"><b>Customer price</b><span>${esc(r.acct.list)}</span></div>
+   <div class="dtw"><table class="dt"><thead><tr><th>Line</th><th class="r">Amount</th></tr></thead><tbody>
+   ${r.lines.map(l=>`<tr><td>${esc(l.t)}<span class="s">${esc(l.s)}</span></td><td class="r">${usd(l.price)}</td></tr>`).join('')}
+   </tbody></table></div>
+   <div class="sumrows">
+    <div><span>Subtotal</span><span class="num">${usd(r.subtotal)}</span></div>
+    ${r.discount?`<div><span>Discount ${Math.round(r.disc*100)}%</span><span class="num">−${usd(r.discount)}</span></div>`:''}
+    <div><span>${r.acct.tax?'Est. AZ sales tax 8.6%, product only':'Sales tax, resale exempt'}</span><span class="num">${usd(r.tax)}</span></div>
+    <div class="g"><span>Quote total</span><span class="num">${usd(r.total)}</span></div>
    </div>
-   <div class="internal" aria-label="Internal margin">
-     <span class="h">Internal · not shown to customer</span>
-     <div class="r"><span>Material cost</span><span>${usd(r.matCost)}</span></div>
-     <div class="r"><span>Labor cost</span><span>${usd(r.labCost)}</span></div>
-     <div class="r"><span>Gross margin</span><span style="color:${r.margin<FLOOR?'var(--red)':'var(--green)'}">${usd(gm)} · ${pct(r.margin)}</span></div>
-     <div class="mbar"><i style="width:${mw*100}%;background:${r.margin<FLOOR?'var(--red)':'var(--green)'}"></i><b style="left:${FLOOR/0.6*100}%"></b></div>
-     <div class="r"><span>Target ${pct(r.t)} · floor ${pct(FLOOR)}</span><span>${appr}</span></div>
+   <div class="internal">
+    <span class="h">Internal margin, not on the customer copy</span>
+    <div class="r"><span>Material cost</span><span class="num">${usd(r.matCost)}</span></div>
+    <div class="r"><span>Labor cost</span><span class="num">${usd(r.labCost)}</span></div>
+    <div class="r"><span>Gross margin</span><span class="num" style="color:${low?'var(--err)':'var(--ok)'};font-weight:600">${usd(r.net-r.cost)}, ${pct(r.margin)}</span></div>
+    <div class="mbar"><i style="width:${mw*100}%;background:${low?'var(--err)':'var(--ok)'}"></i><b style="left:${FLOOR/0.6*100}%"></b></div>
+    <div class="r"><span>Target ${pct(r.t)}, floor ${pct(FLOOR)}</span><span>${appr}</span></div>
    </div>
-   <div class="qactions">
-     <button class="btn" type="button" disabled title="Available in the full build"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Push to ERP</button>
-     <button class="btn primary" type="button" id="openDoc2"${r.blocks.length?' disabled':''}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/></svg>${r.blocks.length?'Fix blockers to release quote':'Preview customer quote'}</button>
-   </div>
-   <p class="erpnote">Push to ERP creates the sales order, BOM and routing in SYSPRO, Epicor or your system in the full build.</p>`;
-  const b=$('openDoc2'); if(b) b.addEventListener('click',openDoc);
+   <button class="btn erpbtn" type="button" disabled title="Available in the full build"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Push to ERP</button>
+   <p class="erp-note">Creates the sales order, BOM and routing in SYSPRO, Epicor or your ERP in the full build.</p>`;
+}
+function renderLog(r,c){
+  const job=JOBS[S.job];
+  const base=[
+    {t:job.created,d:'olive',x:`Quote ${job.no} created`,w:'Shlok Mistry'},
+    {t:job.created,d:'olive',x:`${r.acct.list} applied to ${r.acct.name}`,w:'System'},
+    ...r.rules.filter(x=>x.status==='block'||x.status==='review').map(x=>({t:hhmm(S.saved),d:x.status==='block'?'err':'warn',x:`${x.id} ${x.status==='block'?'blocked':'flagged'}: ${x.name}`,w:'Rules engine'})),
+    {t:hhmm(S.saved),d:'olive',x:`Rev ${job.rev} recalculated, total ${usd(r.total)}`,w:'System'}
+  ];
+  const all=[...base,...S.events[S.job]].reverse();
+  $('p-log').innerHTML=`<div class="ptitle"><b>Activity</b><span>Audit trail for ${job.no}</span></div>
+   <ul class="log">${all.map(e=>`<li><time>${e.t}</time><span class="dot ${e.d}"></span><span>${esc(e.x)}<span class="who"> by ${esc(e.w)}</span></span></li>`).join('')}</ul>`;
 }
 
-/* ---------- quote document ---------- */
+/* release / approval */
+$('relBtn').addEventListener('click',()=>{
+  const r=last; if(!r||!r.valid||r.blocks.length) return;
+  const now=hhmm(new Date());
+  if(r.reviews.length){S.requested[S.job]=true; S.events[S.job].push({t:now,d:'brass',x:`Approval requested from sales manager for ${r.reviews.map(x=>x.id).join(', ')}`,w:'Shlok Mistry'}); toast('Approval requested. The sales manager has been notified.')}
+  else {S.sent[S.job]=true; S.events[S.job].push({t:now,d:'brass',x:`Quote released and sent to ${r.acct.name}`,w:'Shlok Mistry'}); toast(`Quote ${JOBS[S.job].no} released.`)}
+  render();
+});
+
+/* quote document */
 function docText(){
-  const r=last,c=cfg; if(!r||!r.valid) return '';
-  const L=[`Saguaro Iron Works · Quote ${QNO[S.job]}`,`Prepared for: ${r.acct.bill}`,`Date ${fmtDL(new Date())} · ships ${fmtDL(r.ship)}`,''];
-  r.lines.forEach(l=>L.push(`${l.t} — ${usd(l.price)}`,`   ${l.s}`));
-  L.push('',`Subtotal ${usd(r.subtotal)}`); if(r.discount) L.push(`Discount ${Math.round(r.disc*100)}% −${usd(r.discount)}`);
+  const r=last; if(!r||!r.valid) return '';
+  const L=[`Saguaro Iron Works, Quote ${JOBS[S.job].no}`,`Prepared for: ${r.acct.bill}`,`Date ${fmtDL(new Date())}, ships ${fmtDL(r.ship)}`,''];
+  r.lines.forEach(l=>L.push(`${l.t}: ${usd(l.price)}`,`   ${l.s}`));
+  L.push('',`Subtotal ${usd(r.subtotal)}`); if(r.discount) L.push(`Discount ${Math.round(r.disc*100)}%: −${usd(r.discount)}`);
   L.push(`Tax ${usd(r.tax)}`,`Total ${usd(r.total)}`,'','50% deposit to start fabrication. Quote valid 30 days.');
   return L.join('\n');
 }
 function renderDoc(){
   const r=last,c=cfg; if(!r||!r.valid) return;
-  const today=new Date(), valid=new Date(); valid.setDate(valid.getDate()+30);
-  const deposit=Math.round(r.total*50)/100;
+  const job=JOBS[S.job], today=new Date(), valid=new Date(); valid.setDate(valid.getDate()+30);
   $('docIn').innerHTML=`
-   <div class="doc-top">
-     <div><h2>Quotation</h2><div class="co">Saguaro Iron Works · Phoenix, Arizona · sample company</div></div>
-     <div class="doc-meta"><span>Quote</span><span>${QNO[S.job]}</span><span>Date</span><span>${fmtDL(today)}</span><span>Valid until</span><span>${fmtDL(valid)}</span><span>Est. ship</span><span>${fmtDL(r.ship)}</span></div>
+   <div class="lh">
+     <div class="co"><span class="brand-mark" style="width:32px;height:32px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="5" y="3" width="14" height="18" rx=".5"/><path d="M9.5 3v18M14.5 3v18M5 12h14"/></svg></span><div><b>Saguaro Iron Works</b><span>Phoenix, Arizona. Sample company.</span></div></div>
+     <div><h2>Quotation</h2><div class="dm"><span>Quote</span><span>${job.no}</span><span>Revision</span><span>${job.rev}</span><span>Date</span><span>${fmtDL(today)}</span><span>Valid until</span><span>${fmtDL(valid)}</span></div></div>
    </div>
-   <div class="doc-two">
+   <div class="d2">
      <div style="display:grid;gap:14px">
-       <div class="doc-box"><span class="k">Prepared for</span><b>${esc(r.acct.bill)}</b><span>${esc(r.acct.addr)}</span></div>
-       <div class="doc-box"><span class="k">Product</span><span>${esc(r.lines[0].t)}</span><span class="mono" style="font-size:12px">${esc(r.lines[0].s)}</span><span class="mono" style="font-size:12px">Built to field measure ${frac(r.W)} × ${frac(r.H)}</span></div>
+       <div class="db"><span class="k">Prepared for</span><b>${esc(r.acct.bill)}</b><span>${esc(r.acct.addr)}</span></div>
+       <div class="db"><span class="k">Product</span><span>${esc(r.lines[0].t)}</span><span class="pn">${esc(r.lines[0].s)}</span><span class="pn">Built to field measure ${frac(r.W)} × ${frac(r.H)}</span></div>
+       <div class="db"><span class="k">Estimated ship date</span><span>${fmtDL(r.ship)}</span></div>
      </div>
-     <div class="doc-thumb">${drawDoor(r,c,{swing:false,entry:true})}</div>
+     <div class="thumb">${drawDoor(r,c,{dim:true,swing:false,call:false})}</div>
    </div>
-   <table>
-     <thead><tr><th>Description</th><th class="n">Qty</th><th class="n">Amount</th></tr></thead>
+   <table><thead><tr><th>Description</th><th class="n">Qty</th><th class="n">Amount</th></tr></thead>
      <tbody>${r.lines.map(l=>`<tr><td>${esc(l.t)}<div class="hint">${esc(l.s)}</div></td><td class="n">1</td><td class="n">${usd(l.price)}</td></tr>`).join('')}</tbody>
      <tfoot>
        <tr><td colspan="2" class="n">Subtotal</td><td class="n">${usd(r.subtotal)}</td></tr>
        ${r.discount?`<tr><td colspan="2" class="n">Discount ${Math.round(r.disc*100)}%</td><td class="n">−${usd(r.discount)}</td></tr>`:''}
-       <tr><td colspan="2" class="n">${r.acct.tax?'Sales tax (est.)':'Sales tax (resale exempt)'}</td><td class="n">${usd(r.tax)}</td></tr>
+       <tr><td colspan="2" class="n">${r.acct.tax?'Sales tax (estimated)':'Sales tax (resale exempt)'}</td><td class="n">${usd(r.tax)}</td></tr>
        <tr class="g"><td colspan="2" class="n">Total</td><td class="n">${usd(r.total)}</td></tr>
-       <tr><td colspan="2" class="n hint">Deposit due at order (50%)</td><td class="n hint">${usd(deposit)}</td></tr>
-     </tfoot>
-   </table>
+       <tr><td colspan="2" class="n hint">Deposit due at order, 50%</td><td class="n hint">${usd(Math.round(r.total*50)/100)}</td></tr>
+     </tfoot></table>
    <div class="terms">
-     <span>Fabrication starts on signed acceptance and deposit. Balance due on ${cfg.install?'completion of installation':'delivery'}.</span>
-     <span>Lifetime structural warranty on welds · 2-year finish warranty · hardware per manufacturer.</span>
-     <span>Unit is built to the smallest field measurement listed above. Changes after release may change price and ship date.</span>
-     ${r.reviews.length?`<span style="color:#92400e">Pending internal review: ${r.reviews.map(x=>x.name).join('; ')}.</span>`:''}
+     <span>Fabrication starts on signed acceptance and deposit. Balance due on ${c.install?'completion of installation':'delivery'}.</span>
+     <span>Lifetime structural warranty on welds. Two-year finish warranty. Hardware per manufacturer.</span>
+     <span>Built to the smallest field measurement listed. Changes after release may affect price and ship date.</span>
    </div>
-   <div class="sign"><div>Customer signature · date</div><div>Saguaro Iron Works · date</div></div>`;
+   <div class="sign"><div>Customer signature and date</div><div>Saguaro Iron Works and date</div></div>`;
 }
-function openDoc(){ if(!last||!last.valid||last.blocks.length) {selTab($('t-rules')); return} renderDoc(); $('modal').hidden=false; $('closeDoc').focus() }
+function openDoc(){ if(!last||!last.valid||last.blocks.length){selTab(tabs[3]); toast('Fix the blocked rules before previewing the customer quote.'); return} renderDoc(); $('modal').hidden=false; $('closeDoc').focus() }
 $('openDoc').addEventListener('click',openDoc);
 $('closeDoc').addEventListener('click',()=>{$('modal').hidden=true});
 $('modal').addEventListener('click',e=>{if(e.target===$('modal')) $('modal').hidden=true});
@@ -1019,119 +1080,95 @@ $('copyDoc').addEventListener('click',()=>{
   const ok=()=>{b.textContent='Copied'; setTimeout(()=>b.textContent='Copy as text',1600)};
   try{navigator.clipboard.writeText(txt).then(ok).catch(()=>{b.textContent='Copy blocked'})}catch(e){b.textContent='Copy blocked'}
 });
+function toast(msg,ms=2800){const t=document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),ms)}
 
-/* ---------- tabs ---------- */
+/* tabs */
 const tabs=[...document.querySelectorAll('.tab')];
 function selTab(t){tabs.forEach(x=>{const on=x===t; x.setAttribute('aria-selected',on); x.tabIndex=on?0:-1; $(x.getAttribute('aria-controls')).hidden=!on})}
 tabs.forEach((t,i)=>{t.addEventListener('click',()=>selTab(t)); t.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length]; selTab(n); n.focus()}})});
 selTab(tabs[0]);
 
-/* ---------- autoplay demo ---------- */
+/* autoplay demo */
 const D={on:false,s:1,tx:0,ty:0,tok:0};
 const cam=$('cam'), cur=$('dcur'), cap=$('dcap'), ring=$('dring'), card=$('dcard');
-const side=document.querySelector('.side'), tb=document.querySelector('.tabbody'), right=document.querySelector('.right');
+const rail=document.querySelector('.rail'), tb=document.querySelector('.tbody'), panel=document.querySelector('.panel');
 const sleep=ms=>new Promise((res,rej)=>{const t=D.tok; setTimeout(()=>(t===D.tok&&D.on)?res():rej('stop'),ms)});
 function baseRect(el){const r=el.getBoundingClientRect(), c=cam.getBoundingClientRect(); return {x:(r.left-c.left)/D.s,y:(r.top-c.top)/D.s,w:r.width/D.s,h:r.height/D.s}}
 function camTo(el,max=1.6){
   const vw=innerWidth,vh=innerHeight;
   if(!el){D.s=1;D.tx=0;D.ty=0}
-  else{
-    const b=baseRect(el);
-    let s=Math.max(1,Math.min(vw*0.9/b.w,vh*0.86/b.h,max));
+  else{const b=baseRect(el); let s=Math.max(1,Math.min(vw*0.9/b.w,vh*0.86/b.h,max));
     let tx=vw/2-(b.x+b.w/2)*s, ty=vh/2-(b.y+b.h/2)*s;
-    tx=Math.min(0,Math.max(vw-cam.offsetWidth*s,tx)); ty=Math.min(0,Math.max(vh-cam.offsetHeight*s,ty));
-    D.s=s;D.tx=tx;D.ty=ty;
-  }
+    tx=Math.min(0,Math.max(vw-cam.offsetWidth*s,tx)); ty=Math.min(0,Math.max(vh-cam.offsetHeight*s,ty)); D.s=s;D.tx=tx;D.ty=ty}
   cam.style.transform=`translate(${D.tx}px,${D.ty}px) scale(${D.s})`;
   return sleep(1050);
 }
 function cursorTo(el,fx=.5,fy=.5,ms=750){const r=el.getBoundingClientRect(); cur.style.transitionDuration=ms+'ms,300ms'; cur.style.transform=`translate(${r.left+r.width*fx}px,${r.top+r.height*fy}px)`; return sleep(ms+80)}
 async function press(el){await cursorTo(el); cur.classList.add('press'); await sleep(150); el.click(); await sleep(380); cur.classList.remove('press')}
-async function typeInto(el,text){
-  await cursorTo(el,.3,.5); cur.classList.add('press'); await sleep(150); cur.classList.remove('press');
-  el.value=''; el.dispatchEvent(new Event('input',{bubbles:true})); await sleep(180);
-  for(const ch of text){el.value+=ch; el.dispatchEvent(new Event('input',{bubbles:true})); await sleep(95)}
-}
+async function typeInto(el,text){await cursorTo(el,.3,.5); cur.classList.add('press'); await sleep(150); cur.classList.remove('press'); el.value=''; el.dispatchEvent(new Event('input',{bubbles:true})); await sleep(180); for(const ch of text){el.value+=ch; el.dispatchEvent(new Event('input',{bubbles:true})); await sleep(95)}}
 function spot(el,pad=6){if(!el){ring.classList.remove('show');return} const b=baseRect(el); Object.assign(ring.style,{left:(b.x-pad)+'px',top:(b.y-pad)+'px',width:(b.w+pad*2)+'px',height:(b.h+pad*2)+'px'}); ring.classList.add('show')}
-function caption(n,total,title,text){cap.classList.remove('show'); void cap.offsetWidth; cap.innerHTML=`<span class="n">${String(n).padStart(2,'0')} / ${total}</span><span><b>${esc(title)}</b><span class="t">${esc(text)}</span></span>`; requestAnimationFrame(()=>cap.classList.add('show'))}
-function panelScroll(panel,el,off=70){const top=(el.getBoundingClientRect().top-panel.getBoundingClientRect().top)/D.s+panel.scrollTop-off; panel.scrollTo({top:Math.max(0,top),behavior:'smooth'})}
+function caption(n,total,title,text){cap.classList.remove('show'); void cap.offsetWidth; cap.innerHTML=`<span class="n">${n}/${total}</span><span><b>${esc(title)}</b><span class="t">${esc(text)}</span></span>`; requestAnimationFrame(()=>cap.classList.add('show'))}
+function railTo(el){const top=(el.getBoundingClientRect().top-rail.getBoundingClientRect().top)/D.s+rail.scrollTop-8; rail.scrollTo({top:Math.max(0,top),behavior:'smooth'})}
 function setJob(i){const j=$('job'); j.value=String(i); j.dispatchEvent(new Event('change'))}
-async function titleCard(title,sub,ms,tags){
-  card.innerHTML=`<div class="lm"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 3v18M15 3v18M5 12h14"/></svg></div><h2>${esc(title)}</h2><p>${esc(sub)}</p>${tags?`<div class="tags">${tags.map(t=>`<span class="bdg">${esc(t)}</span>`).join('')}</div>`:''}`;
-  card.hidden=false; void card.offsetWidth; card.classList.add('show');
-  await sleep(ms);
-}
+async function titleCard(title,sub,ms){card.innerHTML=`<div class="lm"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="5" y="3" width="14" height="18" rx=".5"/><path d="M9.5 3v18M14.5 3v18M5 12h14"/></svg></div><h2>${esc(title)}</h2><p>${esc(sub)}</p>`; card.hidden=false; void card.offsetWidth; card.classList.add('show'); await sleep(ms)}
 async function hideCard(){card.classList.remove('show'); await sleep(650); card.hidden=true}
-function toast(msg,ms=2600){const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),ms)}
 
 async function runDemo(){
-  if(innerWidth<1240||innerHeight<640){toast('Make the window at least 1240 × 640 to play the demo. Full screen at 1920 × 1080 looks best.',3600); return}
+  if(innerWidth<1320||innerHeight<700){toast('Make the window at least 1320 × 700 to play the demo. Full screen at 1920 × 1080 looks best.',3800); return}
   D.on=true; D.tok++; document.body.classList.add('demo');
-  const N=11;
+  const N=10;
   try{
-    $('modal').hidden=true; selTab(tabs[0]); load(0); side.scrollTop=0; tb.scrollTop=0;
-    await titleCard('Quote a custom security door in under a minute','DoorIQ · configure, price and build in one screen',3400,['Live pricing','BOM + cut list','Rules engine','ERP-ready']);
-    await hideCard(); cur.style.transform=`translate(${innerWidth*0.55}px,${innerHeight*0.6}px)`; cur.classList.add('show');
+    $('modal').hidden=true; selTab(tabs[0]); load(0); document.querySelectorAll('.sec').forEach(d=>d.open=true); rail.scrollTop=0; tb.scrollTop=0;
+    await titleCard('Quote a custom security door in under a minute','DoorIQ for Saguaro Iron Works',3400); await hideCard();
+    cur.style.transform=`translate(${innerWidth*0.55}px,${innerHeight*0.6}px)`; cur.classList.add('show');
 
     caption(1,N,'Start from field measurements','Type what the installer measured. DoorIQ builds to the smallest size and checks for square.');
-    const mg=$('wTop').closest('.grp'); panelScroll(side,mg,20); await sleep(400);
-    await camTo(mg,1.7); spot(mg);
-    await typeInto($('wTop'),'36 1/2'); await typeInto($('wMid'),'36 3/8'); await sleep(900);
-    spot(null); await camTo(null);
+    const mg=$('sec-meas'); railTo(mg); await sleep(500); await camTo(mg,1.7); spot(mg,2);
+    await typeInto($('wTop'),'36 1/2'); await typeInto($('wMid'),'36 3/8'); await sleep(900); spot(null); await camTo(null);
 
-    caption(2,N,'Pick a style','The door redraws and re-prices on every click.');
-    const st=$('g-style'); panelScroll(side,st.closest('.grp'),20); await sleep(600);
-    await press(st.querySelector('[data-v=classic]')); await sleep(650);
-    await press(st.querySelector('[data-v=modern]')); await sleep(650);
-    await press(st.querySelector('[data-v=scroll]')); await sleep(500);
+    caption(2,N,'Configure the door','Style, screen and finish. The shop drawing and price update on every click.');
+    railTo($('sec-style')); await sleep(600);
+    await press($('g-style').querySelector('[data-v=classic]')); await sleep(600);
+    await press($('g-style').querySelector('[data-v=modern]')); await sleep(600);
+    await press($('g-style').querySelector('[data-v=scroll]')); await sleep(400);
+    railTo($('sec-fin')); await sleep(600);
+    await press($('g-color').querySelector('[data-v=bronze]')); await sleep(500);
+    await press($('g-color').querySelector('[data-v=black]')); await sleep(300);
 
-    caption(3,N,'Finish and screen','Powder coat colors and mesh types render live on the door.');
-    const cg=$('g-color'); panelScroll(side,cg.closest('.grp'),20); await sleep(600);
-    await press(cg.querySelector('[data-v=bronze]')); await sleep(550);
-    await press(cg.querySelector('[data-v=sand]')); await sleep(550);
-    await press(cg.querySelector('[data-v=black]')); await sleep(300);
-    await camTo(document.querySelector('.scene'),1.5); await sleep(1800);
-    await camTo(document.querySelector('.perf'),1.6); await sleep(2000);
-    await camTo(null);
+    caption(3,N,'A real shop drawing','Dimensioned elevation with callouts and title block, generated from the configuration.');
+    await camTo(document.querySelector('.sheet'),1.45); await sleep(2600); await camTo(document.querySelector('.specs'),1.6); await sleep(1800); await camTo(null);
 
-    caption(4,N,'Bill of materials, written for you','Part numbers, quantities and cost. Same click that priced the door.');
-    await press(tabs[0]); await camTo(right,1.5);
-    tb.scrollTo({top:tb.scrollHeight*0.5,behavior:'smooth'}); await sleep(2000);
-    tb.scrollTo({top:0,behavior:'smooth'}); await sleep(800);
+    caption(4,N,'Bill of materials, written for you','Part numbers, quantities and cost, plus labor from routing.');
+    await press(tabs[0]); await camTo(panel,1.45); tb.scrollTo({top:tb.scrollHeight*0.5,behavior:'smooth'}); await sleep(2000); tb.scrollTo({top:0,behavior:'smooth'}); await sleep(700);
 
-    caption(5,N,'Cut list, nested on 24-ft stock','Every cut placed to cut scrap. No math at the saw.');
-    await press(tabs[1]); await sleep(2600);
+    caption(5,N,'Cut list and routing','Cuts nested on 24-foot stock, then hours through each work center.');
+    await press(tabs[1]); await sleep(2200); await press(tabs[2]); await sleep(2200); await camTo(null);
 
-    caption(6,N,'Shop routing','Labor hours flow through each work center, from saw to final inspection.');
-    await press(tabs[2]); await sleep(2600);
-    await camTo(null);
-
-    caption(7,N,'Now a hard one','Tall opening, out of square, double-cylinder lock and a 30% discount.');
+    caption(6,N,'Now a hard one','Tall opening, out of square, double-cylinder lock and a 30% discount.');
     const job=$('job'); await cursorTo(job); cur.classList.add('press'); await sleep(150); cur.classList.remove('press');
-    setJob(2); side.scrollTop=0; await sleep(500); spot(document.querySelector('.qt')); await sleep(1800); spot(null);
+    setJob(2); rail.scrollTop=0; await sleep(500); spot(document.querySelector('.rec'),0); await sleep(2200); spot(null);
 
-    caption(8,N,'Rules engine catches it','Problems surface at the quote, not on the shop floor or at the install.');
-    await press(tabs[3]); await camTo(right,1.5); spot($('status'),4); await sleep(1600); spot(null); await sleep(1600);
+    caption(7,N,'The rules engine catches it','Problems surface at the quote, not on the shop floor or at install.');
+    await press(tabs[3]); await camTo(panel,1.45); await sleep(2800);
 
-    caption(9,N,'Margin protection','Under the 22% floor, the quote routes to a manager before it goes out.');
-    await press(tabs[4]); await sleep(300);
-    const intl=document.querySelector('.internal'); panelScroll(tb,intl,120); await sleep(900); spot(intl,4); await sleep(2800); spot(null);
-    await camTo(null);
+    caption(8,N,'Margin is protected','Under the 22% floor, the quote goes to the sales manager before it is sent.');
+    await press(tabs[4]); await sleep(300); const intl=document.querySelector('.internal');
+    const top=(intl.getBoundingClientRect().top-tb.getBoundingClientRect().top)/D.s+tb.scrollTop-120; tb.scrollTo({top,behavior:'smooth'}); await sleep(900);
+    spot(intl,4); await sleep(1600); spot(null); await camTo(null);
+    await press($('relBtn')); await sleep(900); await press(tabs[5]); await camTo(panel,1.45); await sleep(2200); await camTo(null);
 
-    caption(10,N,'Customer-ready quote in one click','Clean job, branded quotation with drawing, terms and signature lines.');
+    caption(9,N,'Customer-ready quote in one click','Back to a clean job: approved, then a branded quotation with the drawing.');
     setJob(0); tb.scrollTop=0; await sleep(700);
     await press($('openDoc')); await sleep(900);
-    $('modal').scrollTo({top:420,behavior:'smooth'}); await sleep(2200);
-    $('modal').scrollTo({top:0,behavior:'smooth'}); await sleep(900);
-    await press($('closeDoc')); await sleep(300);
+    $('modal').scrollTo({top:460,behavior:'smooth'}); await sleep(2200); $('modal').scrollTo({top:0,behavior:'smooth'}); await sleep(800);
+    await press($('closeDoc')); await sleep(300); await press($('relBtn')); await sleep(1200);
 
-    caption(11,N,'Connects to your ERP','Sales order, BOM and routing pushed to SYSPRO, Epicor or your system.');
-    selTab(tabs[4]); await camTo(right,1.5);
-    tb.scrollTo({top:tb.scrollHeight,behavior:'smooth'}); await sleep(800);
-    const erp=document.querySelector('.qactions .btn[disabled]'); if(erp){spot(erp,4); await cursorTo(erp)} await sleep(2400); spot(null);
+    caption(10,N,'Connects to your ERP','Sales order, BOM and routing pushed to SYSPRO, Epicor or your system.');
+    selTab(tabs[4]); await camTo(panel,1.45); tb.scrollTo({top:tb.scrollHeight,behavior:'smooth'}); await sleep(800);
+    const erp=document.querySelector('.erpbtn'); if(erp){spot(erp,4); await cursorTo(erp)} await sleep(2400); spot(null);
 
     await camTo(null); cur.classList.remove('show'); cap.classList.remove('show');
-    await titleCard('Your products. Your rules. Your ERP.','Custom CPQ and shop tools by Analytics with Shlok · analyticswithshlok.com',4800);
+    await titleCard('Your products. Your rules. Your ERP.','Custom CPQ and shop tools by Analytics with Shlok, analyticswithshlok.com',4800);
   }catch(e){}
   stopDemo();
 }
@@ -1139,8 +1176,8 @@ function stopDemo(){
   D.on=false; D.tok++;
   cam.style.transition='none'; cam.style.transform=''; D.s=1;D.tx=0;D.ty=0; void cam.offsetWidth; cam.style.transition='';
   cur.classList.remove('show','press'); cap.classList.remove('show'); ring.classList.remove('show');
-  card.classList.remove('show'); card.hidden=true;
-  document.body.classList.remove('demo');
+  card.classList.remove('show'); card.hidden=true; document.body.classList.remove('demo');
+  S.events=[[],[],[]]; S.sent=[false,false,false]; S.requested=[false,false,false]; load(S.job);
 }
 $('playDemo').addEventListener('click',runDemo);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&D.on) stopDemo()});
