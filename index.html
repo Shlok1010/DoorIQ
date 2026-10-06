@@ -102,8 +102,8 @@ button,input,select{font:inherit;color:inherit}
 .sec>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none}
 .sec>summary::-webkit-details-marker{display:none}
 .sec>summary .n{font-family:var(--f-mono);font-size:11px;color:var(--faint);width:16px}
-.sec>summary .t{font-weight:600;font-size:13px}
-.sec>summary .v{margin-left:auto;color:var(--muted);font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.sec>summary .t{font-weight:600;font-size:13px;white-space:nowrap}
+.sec>summary .v{margin-left:auto;color:var(--muted);font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
 .sec>summary::after{content:"";width:7px;height:7px;border-right:1.5px solid var(--faint);border-bottom:1.5px solid var(--faint);transform:rotate(-45deg);transition:transform .15s;flex:none;margin-left:2px}
 .sec[open]>summary::after{transform:rotate(45deg)}
 .sec>summary:hover{background:var(--sunk)}
@@ -172,6 +172,10 @@ select.inp{font-family:var(--f-ui)}
 .lvl{display:inline-flex;gap:2px;margin-left:6px;vertical-align:-1px}
 .lvl i{width:4px;height:11px;background:var(--line);border-radius:1px}
 .lvl i.f{background:var(--olive)}
+
+.sv-ext{stroke:#B9B49F;stroke-width:.15}.sv-dl{stroke:#A57C2C;stroke-width:.22}
+.sv-dt{font:500 2.3px var(--f-mono);fill:#7A5B1E}.sv-tx{font:500 2.4px var(--f-mono);fill:#9B9C8C}
+.sv-bn{font:600 2.4px var(--f-ui);fill:#7A5B1E}.sv-ct{font:500 2.2px var(--f-mono);fill:#6A6C5E}
 
 /* data panel */
 .tabs{display:flex;border-bottom:1px solid var(--line);overflow-x:auto;flex:none;padding:0 8px}
@@ -369,7 +373,7 @@ body.demo #playDemo{visibility:hidden}
             <button type="button" class="row-opt" data-v="zbar"><span class="rd"></span><b>Z-bar surface mount</b><span class="p">FRM-ZBAR</span><span class="d">Overlaps the opening 1" and hides gaps. Out-swing only.</span></button>
             <button type="button" class="row-opt" data-v="flush"><span class="rd"></span><b>Flush in opening</b><span class="p">FRM-ANG</span><span class="d">Sits inside the jamb. In- or out-swing.</span></button>
           </div>
-          <div class="g2">
+          <div style="display:grid;gap:6px">
             <div class="segs" id="g-swing"><button type="button" data-v="out">Out-swing</button><button type="button" data-v="in">In-swing</button></div>
             <div class="segs" id="g-hand"><button type="button" data-v="LH">Left hand</button><button type="button" data-v="RH">Right hand</button></div>
           </div>
@@ -449,7 +453,7 @@ body.demo #playDemo{visibility:hidden}
 
     <section class="panel" aria-label="Quote data">
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" id="t-bom" aria-controls="p-bom" aria-selected="true" type="button">Bill of materials <span class="cnt" id="c-bom"></span></button>
+        <button class="tab" role="tab" id="t-bom" aria-controls="p-bom" aria-selected="true" type="button">BOM <span class="cnt" id="c-bom"></span></button>
         <button class="tab" role="tab" id="t-cut" aria-controls="p-cut" aria-selected="false" type="button">Cut list <span class="cnt" id="c-cut"></span></button>
         <button class="tab" role="tab" id="t-route" aria-controls="p-route" aria-selected="false" type="button">Routing</button>
         <button class="tab" role="tab" id="t-rules" aria-controls="p-rules" aria-selected="false" type="button">Rules <span class="cnt" id="c-rules"></span></button>
@@ -734,7 +738,7 @@ function compute(c){
 function drawDoor(r,c,v){
   const W=r.W,H=r.H;
   const fx=r.z?-1:0.125, fy=r.z?-1:0.0625;
-  const L=v.call?-22:-6, T=v.dim?-14:-5, Rr=r.fW+fx+(v.call?29:v.dim?12:5), Bb=H+(v.dim?18:5);
+  const L=v.call?-22:-6, T=v.dim?-14:-5, Rr=r.fW+fx+(v.call?33:v.dim?12:5), Bb=H+(v.dim?18:5);
   const vw=Rr-L, vh=Bb-T;
   const fin=FIN[c.color].hex, edge=c.color==='white'||c.color==='sand'?'#5f5b50':shade(fin,-.35);
   const meshCol={ss:'#8E8F86',sol:'#3d3d38',ins:'#7a7a72',none:null}[c.mesh];
@@ -778,7 +782,7 @@ function drawDoor(r,c,v){
     if(p.rails===4) steel(x,y+(lockY-y)/2,w,2);
     if(!o.side&&c.kick) rect(x+2,y+h-12,w-4,10,`fill="${fin}" fill-opacity=".85" stroke="${edge}" stroke-width=".18"`);
     if(!o.side&&c.pet&&o.active){const pw=9,ph=11,px=x+w/2-pw/2,py=y+h-2-(c.kick?10:0)-ph; rect(px,py,pw,ph,`rx=".6" fill="#F0EEE6" stroke="${edge}" stroke-width=".3"`)}
-    if(o.side){S.push(`<text x="${x+w/2}" y="${y+h/2}" text-anchor="middle" class="tx">FIXED</text>`); return}
+    if(o.side){S.push(`<text x="${x+w/2}" y="${y+h/2}" text-anchor="middle" class="sv-tx">FIXED</text>`); return}
     const n=h>84?4:3, hx=o.hinge==='L'?x-0.7:x+w-0.3;
     for(let i=0;i<n;i++){const hy=y+6+(h-16)*i/(n-1); rect(hx,hy,1,4,`rx=".3" fill="#A57C2C"`); if(i===0&&!callHinge) callHinge={x:hx+0.5,y:hy+2,n,left:o.hinge==='L'}}
     if(o.active){
@@ -798,14 +802,14 @@ function drawDoor(r,c,v){
   const dim=(x1,y1,x2,y2,label,off,vert)=>{
     if(!vert){
       const y=y1+off;
-      A.push(`<line x1="${x1}" y1="${y1}" x2="${x1}" y2="${y+(off>0?1:-1)}" class="ext"/><line x1="${x2}" y1="${y1}" x2="${x2}" y2="${y+(off>0?1:-1)}" class="ext"/>`);
-      A.push(`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" class="dl" marker-start="url(#ar)" marker-end="url(#ar)"/>`);
-      A.push(`<rect x="${(x1+x2)/2-label.length*0.95}" y="${y-1.9}" width="${label.length*1.9}" height="3.6" fill="#fff"/><text x="${(x1+x2)/2}" y="${y+1.05}" text-anchor="middle" class="dt">${esc(label)}</text>`);
+      A.push(`<line x1="${x1}" y1="${y1}" x2="${x1}" y2="${y+(off>0?1:-1)}" class="sv-ext"/><line x1="${x2}" y1="${y1}" x2="${x2}" y2="${y+(off>0?1:-1)}" class="sv-ext"/>`);
+      A.push(`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" class="sv-dl" marker-start="url(#ar)" marker-end="url(#ar)"/>`);
+      A.push(`<rect x="${(x1+x2)/2-label.length*0.95}" y="${y-1.9}" width="${label.length*1.9}" height="3.6" fill="#fff"/><text x="${(x1+x2)/2}" y="${y+1.05}" text-anchor="middle" class="sv-dt">${esc(label)}</text>`);
     } else {
       const x=x1+off;
-      A.push(`<line x1="${x1}" y1="${y1}" x2="${x+1}" y2="${y1}" class="ext"/><line x1="${x1}" y1="${y2}" x2="${x+1}" y2="${y2}" class="ext"/>`);
-      A.push(`<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" class="dl" marker-start="url(#ar)" marker-end="url(#ar)"/>`);
-      A.push(`<g transform="translate(${x} ${(y1+y2)/2}) rotate(-90)"><rect x="${-label.length*0.95}" y="-1.9" width="${label.length*1.9}" height="3.6" fill="#fff"/><text x="0" y="1.05" text-anchor="middle" class="dt">${esc(label)}</text></g>`);
+      A.push(`<line x1="${x1}" y1="${y1}" x2="${x+1}" y2="${y1}" class="sv-ext"/><line x1="${x1}" y1="${y2}" x2="${x+1}" y2="${y2}" class="sv-ext"/>`);
+      A.push(`<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}" class="sv-dl" marker-start="url(#ar)" marker-end="url(#ar)"/>`);
+      A.push(`<g transform="translate(${x} ${(y1+y2)/2}) rotate(-90)"><rect x="${-label.length*0.95}" y="-1.9" width="${label.length*1.9}" height="3.6" fill="#fff"/><text x="0" y="1.05" text-anchor="middle" class="sv-dt">${esc(label)}</text></g>`);
     }
   };
   if(v.dim){
@@ -818,10 +822,10 @@ function drawDoor(r,c,v){
   if(v.call){
     const ball=(n,px,py,tx,ty,text,right)=>{
       A.push(`<line x1="${px}" y1="${py}" x2="${tx}" y2="${ty}" stroke="#A57C2C" stroke-width=".22"/><circle cx="${px}" cy="${py}" r=".45" fill="#A57C2C"/>`);
-      A.push(`<circle cx="${tx}" cy="${ty}" r="2" fill="#fff" stroke="#A57C2C" stroke-width=".3"/><text x="${tx}" y="${ty+0.95}" text-anchor="middle" class="bn">${n}</text>`);
-      A.push(`<text x="${right?tx+3:tx-3}" y="${ty+0.9}" text-anchor="${right?'start':'end'}" class="ct">${esc(text)}</text>`);
+      A.push(`<circle cx="${tx}" cy="${ty}" r="2" fill="#fff" stroke="#A57C2C" stroke-width=".3"/><text x="${tx}" y="${ty+0.95}" text-anchor="middle" class="sv-bn">${n}</text>`);
+      A.push(`<text x="${right?tx+3:tx-3}" y="${ty+0.9}" text-anchor="${right?'start':'end'}" class="sv-ct">${esc(text)}</text>`);
     };
-    const rx=fx+r.fW+(v.dim?10:4), lxx=-4;
+    const rx=fx+r.fW+(v.dim?14:4), lxx=-4;
     if(callLock) ball(1,callLock.x,callLock.y,callLock.right?rx:lxx,callLock.y-6,c.lock==='dc'?'LCK-DC-SET':'LCK-SC-SET',callLock.right);
     if(callHinge) ball(2,callHinge.x,callHinge.y,callHinge.left?lxx:rx,callHinge.y+4,`HNG ×${callHinge.n}`,!callHinge.left);
     if(callMesh) ball(3,callMesh.x,callMesh.y,rx,callMesh.y+10,{ss:'MESH-SS12',sol:'MESH-SOL80',ins:'MESH-FG18'}[c.mesh],true);
@@ -831,7 +835,6 @@ function drawDoor(r,c,v){
    <pattern id="grid" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M6 0H0V6" fill="none" stroke="#EFECE2" stroke-width=".12"/></pattern>
    ${meshCol?`<pattern id="mesh" width=".9" height=".9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H.9M0 0V.9" stroke="${meshCol}" stroke-width=".07" stroke-opacity="${c.mesh==='sol'?'.55':'.5'}"/></pattern>`:''}
    <marker id="ar" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 1.2L6 3L0 4.8z" fill="#A57C2C"/></marker>
-   <style>.ext{stroke:#B9B49F;stroke-width:.15}.dl{stroke:#A57C2C;stroke-width:.22}.dt{font:500 2.3px 'IBM Plex Mono',monospace;fill:#7A5B1E}.tx{font:500 2.4px 'IBM Plex Mono',monospace;fill:#9B9C8C}.bn{font:600 2.4px 'IBM Plex Sans',sans-serif;fill:#7A5B1E}.ct{font:500 2.2px 'IBM Plex Mono',monospace;fill:#6A6C5E}</style>
   </defs>
   <rect x="${L}" y="${T}" width="${vw}" height="${vh}" fill="url(#grid)"/>
   ${S.join('')}${A.join('')}</svg>`;
@@ -951,7 +954,7 @@ function renderBOM(r){
   rows+=Object.entries(r.route).map(([wc,o])=>`<tr><td><span class="pn">${wc}</span><span class="s" style="color:var(--ink);font-size:12.5px">${WC[wc].n}</span></td><td class="r">${o.hrs.toFixed(2)} HR</td><td class="r">${usd(WC[wc].rate)}</td><td class="r">${usd(o.ext)}</td></tr>`).join('');
   rows+=`<tr class="tot"><td colspan="3">Total shop cost</td><td class="r">${usd(r.cost)}</td></tr>`;
   $('p-bom').innerHTML=`<div class="ptitle"><b>Bill of materials</b><span>Generated from configuration, ${r.B.length} lines</span></div>
-   <div class="dtw"><table class="dt"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Unit cost</th><th class="r">Extended</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+   <div class="dtw"><table class="sv-dt"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Unit cost</th><th class="r">Extended</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function renderCut(r){
   const NM={tube:'Panel tube 1"×2"',pick:'Picket 1/2" square',hbar:'Slat tube 1"×1"',zbar:'Z-bar frame',flush:'Angle frame'};
@@ -961,7 +964,7 @@ function renderCut(r){
     const u=bins.reduce((s,b)=>s+b.parts.reduce((t,p)=>t+p.len,0),0); used+=u; stock+=bins.length*STOCK;
     const rows=r.pieces.filter(p=>p.mat===m).map(p=>`<tr><td>${esc(p.label)}</td><td class="r">${p.qty}</td><td class="r">${frac(p.len)}</td></tr>`).join('');
     const sticks=bins.map((b,i)=>`<div class="stk"><div class="l"><span>Stick ${i+1}</span><span>Drop ${frac(STOCK-b.used)}</span></div><div class="stick" role="img" aria-label="Stick ${i+1}, ${b.parts.length} cuts">${b.parts.map((p,j)=>`<i class="${j%2?'b':''}" style="width:${(p.len/STOCK*100).toFixed(2)}%" title="${esc(p.label)} ${esc(frac(p.len))}">${p.len/STOCK>.1?esc(frac(p.len)):''}</i>`).join('')}</div></div>`).join('');
-    h+=`<div class="dtw"><table class="dt"><thead><tr><th>${NM[m]} <span class="pn">${P[m].pn}</span></th><th class="r">Qty</th><th class="r">Length</th></tr></thead><tbody>${rows}</tbody></table>
+    h+=`<div class="dtw"><table class="sv-dt"><thead><tr><th>${NM[m]} <span class="pn">${P[m].pn}</span></th><th class="r">Qty</th><th class="r">Length</th></tr></thead><tbody>${rows}</tbody></table>
       <div style="padding:8px;display:grid;gap:6px;border-top:1px solid var(--line-soft)"><div class="ptitle"><span>${bins.length} × 24' stock</span><span>${pct(u/(bins.length*STOCK))} yield</span></div>${sticks}</div></div>`;
   });
   $('p-cut').innerHTML=`<div class="ptitle"><b>Cut list</b><span>${r.cuts} cuts, ${pct(used/stock)} yield, ${frac(KERF)} kerf</span></div>`+h;
@@ -969,7 +972,7 @@ function renderCut(r){
 function renderRoute(r){
   const ops=Object.entries(r.route), tot=ops.reduce((s,[,o])=>s+o.hrs,0);
   $('p-route').innerHTML=`<div class="ptitle"><b>Routing</b><span>${ops.length} operations, ${tot.toFixed(2)} hours</span></div>
-   <div class="dtw"><table class="dt"><thead><tr><th>Op</th><th>Work center</th><th class="r">Hours</th><th class="r">Cost</th></tr></thead><tbody>
+   <div class="dtw"><table class="sv-dt"><thead><tr><th>Op</th><th>Work center</th><th class="r">Hours</th><th class="r">Cost</th></tr></thead><tbody>
    ${ops.map(([wc,o],i)=>`<tr><td class="pn">${String((i+1)*10).padStart(3,'0')}</td><td><span class="pn">${wc}</span><span class="s" style="color:var(--ink);font-size:12.5px">${WC[wc].n}</span><div class="wbar"><i style="width:${(o.hrs/tot*100).toFixed(1)}%"></i></div></td><td class="r">${o.hrs.toFixed(2)}</td><td class="r">${usd(o.ext)}</td></tr>`).join('')}
    <tr class="tot"><td colspan="2">Total labor</td><td class="r">${tot.toFixed(2)}</td><td class="r">${usd(r.labCost)}</td></tr></tbody></table></div>
    <div class="ptitle"><span>Earliest ship date</span><b>${fmtDL(r.ship)}</b></div>`;
@@ -979,7 +982,7 @@ function renderRules(r){
   const ord={block:0,review:1,auto:2,info:3,pass:4};
   const rs=[...r.rules].sort((a,b)=>ord[a.status]-ord[b.status]);
   $('p-rules').innerHTML=`<div class="ptitle"><b>Rules engine</b><span>${r.rules.length} rules evaluated on every change</span></div>
-   <div class="dtw"><table class="dt"><thead><tr><th>Rule</th><th>Check</th><th class="r">Result</th></tr></thead><tbody>
+   <div class="dtw"><table class="sv-dt"><thead><tr><th>Rule</th><th>Check</th><th class="r">Result</th></tr></thead><tbody>
    ${rs.map(x=>`<tr><td class="pn">${x.id}</td><td>${esc(x.name)}<span class="s">${esc(x.detail)}</span></td><td class="r"><span class="res ${x.status}">${LAB[x.status]}</span></td></tr>`).join('')}
    </tbody></table></div>`;
 }
@@ -987,7 +990,7 @@ function renderPrice(r,c){
   const mw=Math.max(0,Math.min(1,r.margin/0.6)), low=r.margin<FLOOR;
   const appr=r.blocks.length?'Blocked by rules':low?(S.requested[S.job]?'Waiting on sales manager':'Needs sales manager approval'):'Within policy, no approval needed';
   $('p-price').innerHTML=`<div class="ptitle"><b>Customer price</b><span>${esc(r.acct.list)}</span></div>
-   <div class="dtw"><table class="dt"><thead><tr><th>Line</th><th class="r">Amount</th></tr></thead><tbody>
+   <div class="dtw"><table class="sv-dt"><thead><tr><th>Line</th><th class="r">Amount</th></tr></thead><tbody>
    ${r.lines.map(l=>`<tr><td>${esc(l.t)}<span class="s">${esc(l.s)}</span></td><td class="r">${usd(l.price)}</td></tr>`).join('')}
    </tbody></table></div>
    <div class="sumrows">
