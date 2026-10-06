@@ -828,7 +828,7 @@ function drawDoor(r,c,v){
     const rx=fx+r.fW+(v.dim?14:4), lxx=-4;
     if(callLock) ball(1,callLock.x,callLock.y,callLock.right?rx:lxx,callLock.y-6,c.lock==='dc'?'LCK-DC-SET':'LCK-SC-SET',callLock.right);
     if(callHinge) ball(2,callHinge.x,callHinge.y,callHinge.left?lxx:rx,callHinge.y+4,`HNG ×${callHinge.n}`,!callHinge.left);
-    if(callMesh) ball(3,callMesh.x,callMesh.y,rx,callMesh.y+10,{ss:'MESH-SS12',sol:'MESH-SOL80',ins:'MESH-FG18'}[c.mesh],true);
+    if(callMesh) ball(3,callMesh.x,callMesh.y,rx,callMesh.y-3,{ss:'MESH-SS12',sol:'MESH-SOL80',ins:'MESH-FG18'}[c.mesh],true);
   }
   return `<svg viewBox="${L} ${T} ${vw} ${vh}" role="img" aria-label="${esc(`Shop drawing of the ${c.opening} security door, unit ${frac(r.fW)} by ${frac(r.fH)}`)}">
   <defs>
@@ -954,7 +954,7 @@ function renderBOM(r){
   rows+=Object.entries(r.route).map(([wc,o])=>`<tr><td><span class="pn">${wc}</span><span class="s" style="color:var(--ink);font-size:12.5px">${WC[wc].n}</span></td><td class="r">${o.hrs.toFixed(2)} HR</td><td class="r">${usd(WC[wc].rate)}</td><td class="r">${usd(o.ext)}</td></tr>`).join('');
   rows+=`<tr class="tot"><td colspan="3">Total shop cost</td><td class="r">${usd(r.cost)}</td></tr>`;
   $('p-bom').innerHTML=`<div class="ptitle"><b>Bill of materials</b><span>Generated from configuration, ${r.B.length} lines</span></div>
-   <div class="dtw"><table class="sv-dt"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Unit cost</th><th class="r">Extended</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+   <div class="dtw"><table class="dt"><thead><tr><th>Item</th><th class="r">Qty</th><th class="r">Unit cost</th><th class="r">Extended</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function renderCut(r){
   const NM={tube:'Panel tube 1"×2"',pick:'Picket 1/2" square',hbar:'Slat tube 1"×1"',zbar:'Z-bar frame',flush:'Angle frame'};
@@ -964,7 +964,7 @@ function renderCut(r){
     const u=bins.reduce((s,b)=>s+b.parts.reduce((t,p)=>t+p.len,0),0); used+=u; stock+=bins.length*STOCK;
     const rows=r.pieces.filter(p=>p.mat===m).map(p=>`<tr><td>${esc(p.label)}</td><td class="r">${p.qty}</td><td class="r">${frac(p.len)}</td></tr>`).join('');
     const sticks=bins.map((b,i)=>`<div class="stk"><div class="l"><span>Stick ${i+1}</span><span>Drop ${frac(STOCK-b.used)}</span></div><div class="stick" role="img" aria-label="Stick ${i+1}, ${b.parts.length} cuts">${b.parts.map((p,j)=>`<i class="${j%2?'b':''}" style="width:${(p.len/STOCK*100).toFixed(2)}%" title="${esc(p.label)} ${esc(frac(p.len))}">${p.len/STOCK>.1?esc(frac(p.len)):''}</i>`).join('')}</div></div>`).join('');
-    h+=`<div class="dtw"><table class="sv-dt"><thead><tr><th>${NM[m]} <span class="pn">${P[m].pn}</span></th><th class="r">Qty</th><th class="r">Length</th></tr></thead><tbody>${rows}</tbody></table>
+    h+=`<div class="dtw"><table class="dt"><thead><tr><th>${NM[m]} <span class="pn">${P[m].pn}</span></th><th class="r">Qty</th><th class="r">Length</th></tr></thead><tbody>${rows}</tbody></table>
       <div style="padding:8px;display:grid;gap:6px;border-top:1px solid var(--line-soft)"><div class="ptitle"><span>${bins.length} × 24' stock</span><span>${pct(u/(bins.length*STOCK))} yield</span></div>${sticks}</div></div>`;
   });
   $('p-cut').innerHTML=`<div class="ptitle"><b>Cut list</b><span>${r.cuts} cuts, ${pct(used/stock)} yield, ${frac(KERF)} kerf</span></div>`+h;
@@ -972,7 +972,7 @@ function renderCut(r){
 function renderRoute(r){
   const ops=Object.entries(r.route), tot=ops.reduce((s,[,o])=>s+o.hrs,0);
   $('p-route').innerHTML=`<div class="ptitle"><b>Routing</b><span>${ops.length} operations, ${tot.toFixed(2)} hours</span></div>
-   <div class="dtw"><table class="sv-dt"><thead><tr><th>Op</th><th>Work center</th><th class="r">Hours</th><th class="r">Cost</th></tr></thead><tbody>
+   <div class="dtw"><table class="dt"><thead><tr><th>Op</th><th>Work center</th><th class="r">Hours</th><th class="r">Cost</th></tr></thead><tbody>
    ${ops.map(([wc,o],i)=>`<tr><td class="pn">${String((i+1)*10).padStart(3,'0')}</td><td><span class="pn">${wc}</span><span class="s" style="color:var(--ink);font-size:12.5px">${WC[wc].n}</span><div class="wbar"><i style="width:${(o.hrs/tot*100).toFixed(1)}%"></i></div></td><td class="r">${o.hrs.toFixed(2)}</td><td class="r">${usd(o.ext)}</td></tr>`).join('')}
    <tr class="tot"><td colspan="2">Total labor</td><td class="r">${tot.toFixed(2)}</td><td class="r">${usd(r.labCost)}</td></tr></tbody></table></div>
    <div class="ptitle"><span>Earliest ship date</span><b>${fmtDL(r.ship)}</b></div>`;
@@ -982,7 +982,7 @@ function renderRules(r){
   const ord={block:0,review:1,auto:2,info:3,pass:4};
   const rs=[...r.rules].sort((a,b)=>ord[a.status]-ord[b.status]);
   $('p-rules').innerHTML=`<div class="ptitle"><b>Rules engine</b><span>${r.rules.length} rules evaluated on every change</span></div>
-   <div class="dtw"><table class="sv-dt"><thead><tr><th>Rule</th><th>Check</th><th class="r">Result</th></tr></thead><tbody>
+   <div class="dtw"><table class="dt"><thead><tr><th>Rule</th><th>Check</th><th class="r">Result</th></tr></thead><tbody>
    ${rs.map(x=>`<tr><td class="pn">${x.id}</td><td>${esc(x.name)}<span class="s">${esc(x.detail)}</span></td><td class="r"><span class="res ${x.status}">${LAB[x.status]}</span></td></tr>`).join('')}
    </tbody></table></div>`;
 }
@@ -990,7 +990,7 @@ function renderPrice(r,c){
   const mw=Math.max(0,Math.min(1,r.margin/0.6)), low=r.margin<FLOOR;
   const appr=r.blocks.length?'Blocked by rules':low?(S.requested[S.job]?'Waiting on sales manager':'Needs sales manager approval'):'Within policy, no approval needed';
   $('p-price').innerHTML=`<div class="ptitle"><b>Customer price</b><span>${esc(r.acct.list)}</span></div>
-   <div class="dtw"><table class="sv-dt"><thead><tr><th>Line</th><th class="r">Amount</th></tr></thead><tbody>
+   <div class="dtw"><table class="dt"><thead><tr><th>Line</th><th class="r">Amount</th></tr></thead><tbody>
    ${r.lines.map(l=>`<tr><td>${esc(l.t)}<span class="s">${esc(l.s)}</span></td><td class="r">${usd(l.price)}</td></tr>`).join('')}
    </tbody></table></div>
    <div class="sumrows">
